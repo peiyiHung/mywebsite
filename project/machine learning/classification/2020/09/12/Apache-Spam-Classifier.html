@@ -1,0 +1,1910 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="twitter:card" content="summary_large_image" /><!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>A Spam Classifier | PeiyiHong</title>
+<meta name="generator" content="Jekyll v4.1.1" />
+<meta property="og:title" content="A Spam Classifier" />
+<meta name="author" content="Peiyi Hong" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="This project builds a spam classifier using Apache SpamAssassin’s public datasets." />
+<meta property="og:description" content="This project builds a spam classifier using Apache SpamAssassin’s public datasets." />
+<link rel="canonical" href="https://peiyihong.github.io/my-blog/project/machine%20learning/classification/2020/09/12/Apache-Spam-Classifier.html" />
+<meta property="og:url" content="https://peiyihong.github.io/my-blog/project/machine%20learning/classification/2020/09/12/Apache-Spam-Classifier.html" />
+<meta property="og:site_name" content="PeiyiHong" />
+<meta property="og:image" content="https://peiyihong.github.io/my-blog/images/roc.png" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2020-09-12T00:00:00-05:00" />
+<script type="application/ld+json">
+{"description":"This project builds a spam classifier using Apache SpamAssassin’s public datasets.","url":"https://peiyihong.github.io/my-blog/project/machine%20learning/classification/2020/09/12/Apache-Spam-Classifier.html","@type":"BlogPosting","headline":"A Spam Classifier","dateModified":"2020-09-12T00:00:00-05:00","datePublished":"2020-09-12T00:00:00-05:00","author":{"@type":"Person","name":"Peiyi Hong"},"image":"https://peiyihong.github.io/my-blog/images/roc.png","mainEntityOfPage":{"@type":"WebPage","@id":"https://peiyihong.github.io/my-blog/project/machine%20learning/classification/2020/09/12/Apache-Spam-Classifier.html"},"@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/my-blog/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="https://peiyihong.github.io/my-blog/feed.xml" title="PeiyiHong" /><link rel="shortcut icon" type="image/x-icon" href="/my-blog/images/favicon.ico"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Primer/15.2.0/primer.css" integrity="sha512-xTz2ys4coGAOz8vuV1NcQBkgVmKhsSEtjbqyMJbBHRplFuvKIUo6xhLHpAyPt9mfR6twHJgn9OgVLuqOvjeBhg==" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css" integrity="sha512-1PKOgIY59xJ8Co8+NE6FZ+LOAZKjy+KY8iq0G4B3CyeY6wYHN3yt9PW0XpSriVlkMXe40PTKnXrLnZ9+fkDaog==" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.12.0/katex.min.css" integrity="sha512-h7nl+xz8wgDlNM4NqKEM4F1NkIRS17M9+uJwIGwuo8vGqIl4BhuCKdxjWEINm+xyrUjNCnK5dCrhM0sj+wTIXw==" crossorigin="anonymous" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.12.0/katex.min.js" integrity="sha512-/CMIhXiDA3m2c9kzRyd97MTb3MC6OVnx4TElQ7fkkoRghwDf6gi41gaT1PwF270W6+J60uTmwgeRpNpJdRV6sg==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.12.0/contrib/auto-render.min.js" integrity="sha512-Do7uJAaHZm5OLrIv/yN4w0iG1dbu01kzdMNnFfu/mAqgUk6Nniv2JYHcwH+cNwjqgLcqcuBBk+JRvprLVI8azg==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha512-0doc9hKxR3PYwso42RD1p5ySZpzzuDiOwMrdCEh2WdJZCjcmFKc/wEnL+z8fBQrnHoiNWbo+3fiGkOYXBdQp4A==" crossorigin="anonymous"></script>
+    <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        renderMathInElement( document.body, {
+        delimiters: [
+            {left: "$$", right: "$$", display: true},
+            {left: "[%", right: "%]", display: true},
+            {left: "$", right: "$", display: false}
+        ]}
+        );
+    });
+    </script>
+
+
+<script>
+function wrap_img(fn) {
+    if (document.attachEvent ? document.readyState === "complete" : document.readyState !== "loading") {
+        var elements = document.querySelectorAll(".post img");
+        Array.prototype.forEach.call(elements, function(el, i) {
+            if (el.getAttribute("title") && (el.className != "emoji")) {
+                const caption = document.createElement('figcaption');
+                var node = document.createTextNode(el.getAttribute("title"));
+                caption.appendChild(node);
+                const wrapper = document.createElement('figure');
+                wrapper.className = 'image';
+                el.parentNode.insertBefore(wrapper, el);
+                el.parentNode.removeChild(el);
+                wrapper.appendChild(el);
+                wrapper.appendChild(caption);
+            }
+        });
+    } else { document.addEventListener('DOMContentLoaded', fn); }
+}
+window.onload = wrap_img;
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function(){
+    // add link icon to anchor tags
+    var elem = document.querySelectorAll(".anchor-link")
+    elem.forEach(e => (e.innerHTML = '<i class="fas fa-link fa-xs"></i>'));
+    });
+</script>
+</head>
+<body><header class="site-header">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/my-blog/">PeiyiHong</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/my-blog/about/">About Me</a><a class="page-link" href="/my-blog/search/">Search</a><a class="page-link" href="/my-blog/categories/">Tags</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">A Spam Classifier</h1><p class="page-description">This project builds a spam classifier using Apache SpamAssassin's public datasets.</p><p class="post-meta post-meta-title"><time class="dt-published" datetime="2020-09-12T00:00:00-05:00" itemprop="datePublished">
+        Sep 12, 2020
+      </time>• 
+          <span itemprop="author" itemscope itemtype="http://schema.org/Person">
+            <span class="p-author h-card" itemprop="name">Peiyi Hong</span></span>
+       • <span class="read-time" title="Estimated read time">
+    
+    
+      10 min read
+    
+</span></p>
+
+    
+      <p class="category-tags"><i class="fas fa-tags category-tags-icon"></i></i> 
+      
+        <a class="category-tags-link" href="/my-blog/categories/#project">project</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/my-blog/categories/#machine learning">machine learning</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/my-blog/categories/#classification">classification</a>
+        
+      
+      </p>
+    
+
+    
+      
+        <div class="pb-5 d-flex flex-wrap flex-justify-end">
+          <div class="px-2">
+
+    <a href="https://github.com/peiyiHong/my-blog/tree/master/_notebooks/2020-09-12-Apache Spam Classifier.ipynb" role="button" target="_blank">
+<img class="notebook-badge-image" src="/my-blog/assets/badges/github.svg" alt="View On GitHub">
+    </a>
+</div>
+
+          <div class="px-2">
+    <a href="https://mybinder.org/v2/gh/peiyiHong/my-blog/master?filepath=_notebooks%2F2020-09-12-Apache+Spam+Classifier.ipynb" target="_blank">
+        <img class="notebook-badge-image" src="/my-blog/assets/badges/binder.svg" alt="Open In Binder"/>
+    </a>
+</div>
+
+          <div class="px-2">
+    <a href="https://colab.research.google.com/github/peiyiHong/my-blog/blob/master/_notebooks/2020-09-12-Apache Spam Classifier.ipynb" target="_blank">
+        <img class="notebook-badge-image" src="/my-blog/assets/badges/colab.svg" alt="Open In Colab"/>
+    </a>
+</div>
+        </div>
+      </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <ul class="section-nav">
+<li class="toc-entry toc-h1"><a href="#Introduction">Introduction </a></li>
+<li class="toc-entry toc-h1"><a href="#Get-the-data">Get the data </a>
+<ul>
+<li class="toc-entry toc-h2"><a href="#Download-emails-and-load-them-into-my-program">Download emails and load them into my program </a></li>
+<li class="toc-entry toc-h2"><a href="#Take-a-look-at-the-emails">Take a look at the emails </a></li>
+<li class="toc-entry toc-h2"><a href="#Get-email-structure">Get email structure </a></li>
+</ul>
+</li>
+<li class="toc-entry toc-h1"><a href="#Preprocessing-emails">Preprocessing emails </a>
+<ul>
+<li class="toc-entry toc-h2"><a href="#Split-emails-into-train-and-test-set">Split emails into train and test set </a></li>
+<li class="toc-entry toc-h2"><a href="#Email-to-text">Email to text </a></li>
+<li class="toc-entry toc-h2"><a href="#Replace-url-with-"URL"">Replace url with &quot;URL&quot; </a></li>
+<li class="toc-entry toc-h2"><a href="#Tokenize">Tokenize </a></li>
+<li class="toc-entry toc-h2"><a href="#Stemming">Stemming </a></li>
+<li class="toc-entry toc-h2"><a href="#Write-a-sklearn-estimator-to-transform-our-email">Write a sklearn estimator to transform our email </a></li>
+<li class="toc-entry toc-h2"><a href="#Vectorizing">Vectorizing </a></li>
+<li class="toc-entry toc-h2"><a href="#Make-Pipeline">Make Pipeline </a></li>
+<li class="toc-entry toc-h2"><a href="#The-processed-datasets">The processed datasets </a></li>
+</ul>
+</li>
+<li class="toc-entry toc-h1"><a href="#Modeling">Modeling </a>
+<ul>
+<li class="toc-entry toc-h2"><a href="#Building-models-and-tuning-them">Building models and tuning them </a>
+<ul>
+<li class="toc-entry toc-h3"><a href="#Naive-Bayes-(baseline-model)">Naive Bayes (baseline model) </a></li>
+<li class="toc-entry toc-h3"><a href="#Logistic-regression">Logistic regression </a></li>
+<li class="toc-entry toc-h3"><a href="#SVM">SVM </a></li>
+<li class="toc-entry toc-h3"><a href="#Random-Forest">Random Forest </a></li>
+</ul>
+</li>
+<li class="toc-entry toc-h2"><a href="#Evaluate-on-test-set">Evaluate on test set </a></li>
+<li class="toc-entry toc-h2"><a href="#Comparing-performance-of-models-using-ROC-curve-and-AUC">Comparing performance of models using ROC curve and AUC </a></li>
+</ul>
+</li>
+<li class="toc-entry toc-h1"><a href="#Conclusion">Conclusion </a></li>
+</ul><!--
+#################################################
+### THIS FILE WAS AUTOGENERATED! DO NOT EDIT! ###
+#################################################
+# file to edit: _notebooks/2020-09-12-Apache Spam Classifier.ipynb
+-->
+
+<div class="container" id="notebook-container">
+        
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="Introduction">
+<a class="anchor" href="#Introduction" aria-hidden="true"><span class="octicon octicon-link"></span></a>Introduction<a class="anchor-link" href="#Introduction"> </a>
+</h1>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>In this project, I built a spam classifer by implementing machine learning models. Models were trained by the datasets from <a href="https://spamassassin.apache.org/old/publiccorpus/">Apache SpamAssassin website</a>.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="Get-the-data">
+<a class="anchor" href="#Get-the-data" aria-hidden="true"><span class="octicon octicon-link"></span></a>Get the data<a class="anchor-link" href="#Get-the-data"> </a>
+</h1>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Download-emails-and-load-them-into-my-program">
+<a class="anchor" href="#Download-emails-and-load-them-into-my-program" aria-hidden="true"><span class="octicon octicon-link"></span></a>Download emails and load them into my program<a class="anchor-link" href="#Download-emails-and-load-them-into-my-program"> </a>
+</h2>
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<details class="description">
+      <summary class="btn btn-sm" data-open="Hide Code" data-close="Show Code"></summary>
+        <p></p>
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">urllib</span>
+<span class="kn">import</span> <span class="nn">tarfile</span>
+<span class="kn">import</span> <span class="nn">urllib.request</span>
+
+<span class="n">download_root</span> <span class="o">=</span> <span class="s2">"https://spamassassin.apache.org/old/publiccorpus/"</span>
+<span class="n">file_names</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"20030228_easy_ham.tar.bz2"</span><span class="p">,</span> <span class="s2">"20030228_easy_ham_2.tar.bz2"</span><span class="p">,</span>
+              <span class="s2">"20030228_hard_ham.tar.bz2"</span><span class="p">,</span> <span class="s2">"20030228_spam.tar.bz2"</span><span class="p">,</span>
+              <span class="s2">"20030228_spam_2.tar.bz2"</span><span class="p">]</span>
+<span class="n">store_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">"data"</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">fetch_data</span><span class="p">(</span><span class="n">root_url</span><span class="o">=</span><span class="n">download_root</span><span class="p">,</span> <span class="n">file_names</span><span class="o">=</span><span class="n">file_names</span><span class="p">,</span>
+               <span class="n">store_path</span><span class="o">=</span><span class="n">store_path</span><span class="p">):</span>
+    
+    <span class="c1"># make directory storing emails</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">store_path</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    
+    <span class="c1"># download files </span>
+    <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">file_names</span><span class="p">:</span>
+        <span class="n">file_url</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">download_root</span><span class="p">,</span> <span class="n">file</span><span class="p">)</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">store_path</span><span class="p">,</span> <span class="n">file</span><span class="p">)</span>
+        <span class="n">urllib</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">urlretrieve</span><span class="p">(</span><span class="n">file_url</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
+    
+    <span class="c1"># extract emails</span>
+    <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">file_names</span><span class="p">:</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">store_path</span><span class="p">,</span> <span class="n">file</span><span class="p">)</span>
+        <span class="k">with</span> <span class="n">tarfile</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">'r'</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">extractall</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="n">store_path</span><span class="p">)</span>
+
+<span class="c1">#fetch_data()</span>
+
+<span class="c1"># get file names of emails</span>
+<span class="n">email_folders</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"hard_ham"</span><span class="p">,</span> <span class="s2">"easy_ham"</span><span class="p">,</span> <span class="s2">"easy_ham_2"</span><span class="p">,</span> 
+                 <span class="s2">"spam"</span><span class="p">,</span> <span class="s2">"spam_2"</span><span class="p">]</span>
+<span class="n">ham_names</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="k">for</span> <span class="n">ham</span> <span class="ow">in</span> <span class="n">email_folders</span><span class="p">[:</span><span class="mi">3</span><span class="p">]:</span>
+    <span class="n">ham_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">store_path</span><span class="p">,</span> <span class="n">ham</span><span class="p">)</span>
+    <span class="n">names</span> <span class="o">=</span> <span class="p">[</span><span class="n">name</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">ham_path</span><span class="p">))</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">20</span><span class="p">]</span>
+    <span class="n">ham_names</span><span class="p">[</span><span class="n">ham</span><span class="p">]</span> <span class="o">=</span> <span class="n">names</span>
+    
+<span class="n">spam_names</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="k">for</span> <span class="n">spam</span> <span class="ow">in</span> <span class="n">email_folders</span><span class="p">[</span><span class="mi">3</span><span class="p">:]:</span>
+    <span class="n">spam_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">store_path</span><span class="p">,</span> <span class="n">spam</span><span class="p">)</span>
+    <span class="n">names</span> <span class="o">=</span> <span class="p">[</span><span class="n">name</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">spam_path</span><span class="p">))</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">20</span><span class="p">]</span>
+    <span class="n">spam_names</span><span class="p">[</span><span class="n">spam</span><span class="p">]</span> <span class="o">=</span> <span class="n">names</span>
+
+<span class="c1"># parse emails</span>
+<span class="kn">import</span> <span class="nn">email</span>
+<span class="kn">import</span> <span class="nn">email.policy</span>
+
+<span class="k">def</span> <span class="nf">load_email</span><span class="p">(</span><span class="n">directory</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">spam_path</span><span class="o">=</span><span class="n">store_path</span><span class="p">):</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">spam_path</span><span class="p">,</span> <span class="n">directory</span><span class="p">)</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">filename</span><span class="p">),</span> <span class="s2">"rb"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">email</span><span class="o">.</span><span class="n">parser</span><span class="o">.</span><span class="n">BytesParser</span><span class="p">(</span><span class="n">policy</span><span class="o">=</span><span class="n">email</span><span class="o">.</span><span class="n">policy</span><span class="o">.</span><span class="n">default</span><span class="p">)</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+<span class="n">hams</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">ham</span> <span class="ow">in</span> <span class="n">email_folders</span><span class="p">[:</span><span class="mi">3</span><span class="p">]:</span>
+    <span class="n">emails</span> <span class="o">=</span> <span class="p">[</span><span class="n">load_email</span><span class="p">(</span><span class="n">ham</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="n">name</span><span class="p">)</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">ham_names</span><span class="p">[</span><span class="n">ham</span><span class="p">]]</span>
+    <span class="n">hams</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">emails</span><span class="p">)</span>
+<span class="n">spams</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">spam</span> <span class="ow">in</span> <span class="n">email_folders</span><span class="p">[</span><span class="mi">3</span><span class="p">:]:</span>
+    <span class="n">emails</span> <span class="o">=</span> <span class="p">[</span><span class="n">load_email</span><span class="p">(</span><span class="n">spam</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="n">name</span><span class="p">)</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">spam_names</span><span class="p">[</span><span class="n">spam</span><span class="p">]]</span>
+    <span class="n">spams</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">emails</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+    </details>
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>explain how to download the emails and load them in my notebook</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="nb">len</span><span class="p">(</span><span class="n">hams</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">spams</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">spams</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">hams</span><span class="p">)</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">spams</span><span class="p">))</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>(4150, 1897, 0.31370927732760046)</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Accuracy of random guess is 70%, so we must do better than that.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Take-a-look-at-the-emails">
+<a class="anchor" href="#Take-a-look-at-the-emails" aria-hidden="true"><span class="octicon octicon-link"></span></a>Take a look at the emails<a class="anchor-link" href="#Take-a-look-at-the-emails"> </a>
+</h2>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><strong>headers</strong></p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">hams</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>[('Return-Path', '&lt;malcolm-sweeps@mrichi.com&gt;'),
+ ('Delivered-To', 'rod@arsecandle.org'),
+ ('Received', '(qmail 16821 invoked by uid 505); 7 May 2002 14:37:01 -0000'),
+ ('Received',
+  'from malcolm-sweeps@mrichi.com by blazing.arsecandle.org\t by uid 500 with qmail-scanner-1.10 (F-PROT: 3.12. Clear:0. Processed in 0.260914 secs); 07 May 2002 14:37:01 -0000'),
+ ('Delivered-To', 'rod-3ds@arsecandle.org'),
+ ('Received', '(qmail 16811 invoked by uid 505); 7 May 2002 14:37:00 -0000'),
+ ('Received',
+  'from malcolm-sweeps@mrichi.com by blazing.arsecandle.org\t by uid 502 with qmail-scanner-1.10 (F-PROT: 3.12. Clear:0. Processed in 0.250416 secs); 07 May 2002 14:37:00 -0000'),
+ ('Received',
+  'from bocelli.siteprotect.com (64.41.120.21)  by h0090272a42db.ne.client2.attbi.com with SMTP; 7 May 2002 14:36:59 -0000'),
+ ('Received',
+  'from mail.mrichi.com ([208.33.95.187])\tby bocelli.siteprotect.com (8.9.3/8.9.3) with SMTP id JAA14328;\tTue, 7 May 2002 09:37:01 -0500'),
+ ('From', 'malcolm-sweeps@mrichi.com'),
+ ('Message-Id', '&lt;200205071437.JAA14328@bocelli.siteprotect.com&gt;'),
+ ('To', 'rod-3ds@arsecandle.org'),
+ ('Subject', 'Malcolm in the Middle Sweepstakes Prize Notification'),
+ ('Date', 'Tue, 07 May 2002 09:38:27 -0600'),
+ ('X-Mailer', 'sendEmail-v1.33')]</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">hams</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="s2">"Subject"</span><span class="p">]</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>'Malcolm in the Middle Sweepstakes Prize Notification'</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><strong>Contents</strong></p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">hams</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">get_content</span><span class="p">()[:</span><span class="mi">600</span><span class="p">])</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>May 7, 2002
+
+
+Dear rod-3ds@arsecandle.org:
+
+
+Congratulations!  On behalf of Frito-Lay, Inc., we are pleased to advise you
+ that you've won Fourth Prize in the 3D's(R) Malcolm in the Middle(TM)
+ Sweepstakes.   Fourth Prize consists of 1 manufacturer's coupon redeemable at
+ participating retailers for 1 free bag of 3D's(R) brand snacks (up to 7 oz.
+ size), with an approximate retail value of $2.59 and an expiration date of
+ 12/31/02.
+
+Follow these instructions to claim your prize:
+
+1.	Print out this email message.
+
+2.	Complete ALL of the information requested.  Print clearly and legibly.  Sign
+ 
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Get-email-structure">
+<a class="anchor" href="#Get-email-structure" aria-hidden="true"><span class="octicon octicon-link"></span></a>Get email structure<a class="anchor-link" href="#Get-email-structure"> </a>
+</h2>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>There are some emails that have multiple parts.</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">Counter</span> 
+
+<span class="k">def</span> <span class="nf">get_email_structure</span><span class="p">(</span><span class="n">email</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">email</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">email</span>
+    <span class="n">payload</span> <span class="o">=</span> <span class="n">email</span><span class="o">.</span><span class="n">get_payload</span><span class="p">()</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">payload</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">"multipart(</span><span class="si">{}</span><span class="s2">)"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">", "</span><span class="o">.</span><span class="n">join</span><span class="p">([</span>
+            <span class="n">get_email_structure</span><span class="p">(</span><span class="n">sub_email</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">sub_email</span> <span class="ow">in</span> <span class="n">payload</span>
+        <span class="p">]))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">email</span><span class="o">.</span><span class="n">get_content_type</span><span class="p">()</span>
+
+<span class="k">def</span> <span class="nf">structure_counter</span><span class="p">(</span><span class="n">emails</span><span class="p">):</span>
+    <span class="n">structures</span> <span class="o">=</span> <span class="p">[</span><span class="n">get_email_structure</span><span class="p">(</span><span class="n">email</span><span class="p">)</span> <span class="k">for</span> <span class="n">email</span> <span class="ow">in</span> <span class="n">emails</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">Counter</span><span class="p">(</span><span class="n">structures</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">structure_counter</span><span class="p">(</span><span class="n">hams</span><span class="p">)</span><span class="o">.</span><span class="n">most_common</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>[('text/plain', 3832),
+ ('text/html', 120),
+ ('multipart(text/plain, application/pgp-signature)', 101),
+ ('multipart(text/plain, text/html)', 63),
+ ('multipart(text/plain, text/plain)', 5),
+ ('multipart(text/plain)', 3),
+ ('multipart(text/plain, application/x-pkcs7-signature)', 2),
+ ('multipart(text/html)', 2),
+ ('multipart(text/plain, application/ms-tnef, text/plain)', 2),
+ ('multipart(text/plain, application/octet-stream)', 2),
+ ('multipart(text/plain, multipart(text/plain))', 2),
+ ('multipart(text/plain, multipart(text/plain, text/plain), text/rfc822-headers)',
+  2),
+ ('multipart(text/plain, image/bmp)', 1),
+ ('multipart(multipart(text/plain, text/html))', 1),
+ ('multipart(text/plain, image/png, image/png)', 1),
+ ('multipart(multipart(text/plain, text/html), image/gif, image/gif, image/gif, image/gif, image/gif, image/gif, image/gif, image/gif, image/gif, image/gif, image/gif, image/jpeg, image/gif, image/gif, image/gif, image/gif, image/gif, image/gif)',
+  1),
+ ('multipart(text/plain, text/enriched)', 1),
+ ('multipart(multipart(text/plain, text/plain, text/plain), application/pgp-signature)',
+  1),
+ ('multipart(text/plain, video/mng)', 1),
+ ('multipart(text/plain, multipart(text/plain, text/plain), multipart(multipart(text/plain, application/x-pkcs7-signature)))',
+  1),
+ ('multipart(text/plain, application/x-java-applet)', 1),
+ ('multipart(text/plain, application/x-patch)', 1),
+ ('multipart(multipart(text/plain, multipart(text/plain), text/plain), application/pgp-signature)',
+  1),
+ ('multipart(multipart(text/plain, text/html), image/jpeg, image/gif, image/gif, image/gif, image/gif)',
+  1),
+ ('multipart(text/plain, application/ms-tnef)', 1),
+ ('multipart(text/plain, text/plain, text/plain)', 1)]</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">structure_counter</span><span class="p">(</span><span class="n">spams</span><span class="p">)</span><span class="o">.</span><span class="n">most_common</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>[('text/plain', 816),
+ ('text/html', 772),
+ ('multipart(text/plain, text/html)', 159),
+ ('multipart(text/html)', 49),
+ ('multipart(text/plain)', 44),
+ ('multipart(multipart(text/html))', 23),
+ ('multipart(multipart(text/plain, text/html))', 5),
+ ('multipart(text/plain, application/octet-stream)', 3),
+ ('multipart(text/html, text/plain)', 3),
+ ('multipart(text/plain, image/jpeg)', 3),
+ ('multipart(text/plain, application/octet-stream, text/plain)', 3),
+ ('multipart(text/html, application/octet-stream)', 2),
+ ('multipart/alternative', 2),
+ ('multipart(text/html, image/jpeg)', 2),
+ ('multipart(multipart(text/plain), application/octet-stream)', 2),
+ ('multipart(multipart(text/html), application/octet-stream, image/jpeg)', 1),
+ ('multipart(multipart(text/plain, text/html), image/gif)', 1),
+ ('multipart(text/plain, multipart(text/plain))', 1),
+ ('multipart(multipart(text/plain, text/html), image/jpeg, image/jpeg, image/jpeg, image/jpeg, image/jpeg)',
+  1),
+ ('multipart(multipart(text/plain, text/html), image/jpeg, image/jpeg, image/jpeg, image/jpeg, image/gif)',
+  1),
+ ('text/plain charset=us-ascii', 1),
+ ('multipart(multipart(text/html), image/gif)', 1),
+ ('multipart(multipart(text/plain, text/html), application/octet-stream, application/octet-stream, application/octet-stream, application/octet-stream)',
+  1),
+ ('multipart(multipart(text/plain, text/html), image/gif, image/jpeg)', 1)]</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>It seems that most hams are plain text, while spams are more often html. What we need to do next?</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="Preprocessing-emails">
+<a class="anchor" href="#Preprocessing-emails" aria-hidden="true"><span class="octicon octicon-link"></span></a>Preprocessing emails<a class="anchor-link" href="#Preprocessing-emails"> </a>
+</h1>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>write helper funtions and make pipeline</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Split-emails-into-train-and-test-set">
+<a class="anchor" href="#Split-emails-into-train-and-test-set" aria-hidden="true"><span class="octicon octicon-link"></span></a>Split emails into train and test set<a class="anchor-link" href="#Split-emails-into-train-and-test-set"> </a>
+</h2>
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span> 
+<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">train_test_split</span>
+
+<span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">hams</span><span class="o">+</span><span class="n">spams</span><span class="p">)</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">hams</span><span class="p">)</span> <span class="o">+</span> <span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">spams</span><span class="p">))</span>
+
+<span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> 
+                                                    <span class="n">random_state</span><span class="o">=</span><span class="mi">44</span><span class="p">,</span> 
+                                                    <span class="n">stratify</span><span class="o">=</span><span class="n">y</span><span class="p">)</span>
+<span class="n">X_train</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">X_test</span><span class="o">.</span><span class="n">shape</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>((4837,), (1210,))</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Email-to-text">
+<a class="anchor" href="#Email-to-text" aria-hidden="true"><span class="octicon octicon-link"></span></a>Email to text<a class="anchor-link" href="#Email-to-text"> </a>
+</h2>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><strong>Parse HTML</strong></p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">bs4</span> <span class="kn">import</span> <span class="n">BeautifulSoup</span>
+
+<span class="k">def</span> <span class="nf">html_to_plain_text</span><span class="p">(</span><span class="n">html</span><span class="p">):</span>
+    <span class="n">soup</span> <span class="o">=</span> <span class="n">BeautifulSoup</span><span class="p">(</span><span class="n">html</span><span class="p">,</span> <span class="s2">"lxml"</span><span class="p">)</span>
+    <span class="n">strings</span> <span class="o">=</span> <span class="s2">""</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">soup</span><span class="o">.</span><span class="n">find_all</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">i</span><span class="o">.</span><span class="n">string</span><span class="p">:</span>
+            <span class="n">strings</span> <span class="o">+=</span> <span class="n">i</span><span class="o">.</span><span class="n">string</span> <span class="o">+</span> <span class="s2">"</span><span class="se">\n</span><span class="s2">"</span>
+    <span class="k">return</span> <span class="n">strings</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><strong>Turn email to plain text</strong></p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">email_to_text</span><span class="p">(</span><span class="n">email</span><span class="p">):</span>
+    <span class="n">html</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">for</span> <span class="n">part</span> <span class="ow">in</span> <span class="n">email</span><span class="o">.</span><span class="n">walk</span><span class="p">():</span>
+        <span class="n">ctype</span> <span class="o">=</span> <span class="n">part</span><span class="o">.</span><span class="n">get_content_type</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">ctype</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"text/plain"</span><span class="p">,</span> <span class="s2">"text/html"</span><span class="p">):</span>
+            <span class="k">continue</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">content</span> <span class="o">=</span> <span class="n">part</span><span class="o">.</span><span class="n">get_content</span><span class="p">()</span>
+        <span class="k">except</span><span class="p">:</span> <span class="c1"># in case of encoding issues</span>
+            <span class="n">content</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">part</span><span class="o">.</span><span class="n">get_payload</span><span class="p">())</span>
+        <span class="k">if</span> <span class="n">ctype</span> <span class="o">==</span> <span class="s2">"text/plain"</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">content</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">html</span> <span class="o">=</span> <span class="n">content</span>
+    <span class="k">if</span> <span class="n">html</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">html_to_plain_text</span><span class="p">(</span><span class="n">html</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">example_spam</span> <span class="o">=</span> <span class="n">email_to_text</span><span class="p">(</span><span class="n">spams</span><span class="p">[</span><span class="mi">10</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">example_spam</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Cellular Phone Accessories All At Below Wholesale Prices!
+
+http://202.101.163.34:81/sites/merchant/sales/
+
+Hands Free Ear Buds 1.99! 
+Phone Holsters 1.98! 
+Booster Antennas Only $0.99
+Phone Cases 1.98! 
+Car Chargers 1.98! 
+Face Plates As Low As 0.99! 
+Lithium Ion Batteries As Low As 6.94! 
+
+http://202.101.163.34:81/sites/merchant/sales/
+
+Click Below For Accessories On All NOKIA, MOTOROLA LG, NEXTEL, 
+SAMSUNG, QUALCOMM, ERICSSON, AUDIOVOX PHONES At Below 
+WHOLESALE PRICES!
+
+http://202.101.163.34:81/sites/merchant/sales/
+
+***If You Need Assistance Please Call Us (732) 751-1457***
+
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+To be removed from future mailings please send your remove 
+request to: removemenow68994@btamail.net.cn 
+Thank You and have a super day :)
+
+
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id='Replace-url-with-"URL"'>
+<a class="anchor" href="#Replace-url-with-" url aria-hidden="true"><span class="octicon octicon-link"></span></a>Replace url with "URL"<a class="anchor-link" href="#Replace-url-with-%22URL%22"> </a>
+</h2>
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">re</span>
+<span class="n">url_pattern</span> <span class="o">=</span> <span class="s1">'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&amp;+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+'</span>
+<span class="n">example_spam</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="n">url_pattern</span><span class="p">,</span> <span class="s2">"URL"</span><span class="p">,</span> <span class="n">example_spam</span><span class="p">)</span>
+<span class="n">example_spam</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>'Cellular Phone Accessories All At Below Wholesale Prices!\n\nURL\n\nHands Free Ear Buds 1.99! \nPhone Holsters 1.98! \nBooster Antennas Only $0.99\nPhone Cases 1.98! \nCar Chargers 1.98! \nFace Plates As Low As 0.99! \nLithium Ion Batteries As Low As 6.94! \n\nURL\n\nClick Below For Accessories On All NOKIA, MOTOROLA LG, NEXTEL, \nSAMSUNG, QUALCOMM, ERICSSON, AUDIOVOX PHONES At Below \nWHOLESALE PRICES!\n\nURL\n\n***If You Need Assistance Please Call Us (732) 751-1457***\n\n\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\nTo be removed from future mailings please send your remove \nrequest to: removemenow68994@btamail.net.cn \nThank You and have a super day :)\n\n'</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Tokenize">
+<a class="anchor" href="#Tokenize" aria-hidden="true"><span class="octicon octicon-link"></span></a>Tokenize<a class="anchor-link" href="#Tokenize"> </a>
+</h2>
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">nltk</span>
+<span class="kn">from</span> <span class="nn">nltk.tokenize</span> <span class="kn">import</span> <span class="n">word_tokenize</span>
+<span class="n">nltk</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="s1">'punkt'</span><span class="p">)</span>
+
+<span class="n">example_spam_tokenized</span> <span class="o">=</span> <span class="n">word_tokenize</span><span class="p">(</span><span class="n">example_spam</span><span class="p">)</span>
+<span class="n">example_spam_tokenized</span><span class="p">[:</span><span class="mi">10</span><span class="p">]</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stderr output_text">
+<pre>[nltk_data] Downloading package punkt to /Users/hongpeiyi/nltk_data...
+[nltk_data]   Package punkt is already up-to-date!
+</pre>
+</div>
+</div>
+
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>['Cellular',
+ 'Phone',
+ 'Accessories',
+ 'All',
+ 'At',
+ 'Below',
+ 'Wholesale',
+ 'Prices',
+ '!',
+ 'URL']</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Stemming">
+<a class="anchor" href="#Stemming" aria-hidden="true"><span class="octicon octicon-link"></span></a>Stemming<a class="anchor-link" href="#Stemming"> </a>
+</h2>
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">stemming_email</span><span class="p">(</span><span class="n">tokenized_email</span><span class="p">):</span>
+    <span class="n">stemmer</span> <span class="o">=</span> <span class="n">nltk</span><span class="o">.</span><span class="n">PorterStemmer</span><span class="p">()</span>
+    <span class="n">stemmed_words</span> <span class="o">=</span> <span class="p">[</span><span class="n">stemmer</span><span class="o">.</span><span class="n">stem</span><span class="p">(</span><span class="n">word</span><span class="p">)</span> <span class="k">for</span> <span class="n">word</span> <span class="ow">in</span> <span class="n">tokenized_email</span><span class="p">]</span>
+    <span class="k">return</span> <span class="s2">" "</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">stemmed_words</span><span class="p">)</span>
+
+<span class="n">stemmed_eamil</span> <span class="o">=</span> <span class="n">stemming_email</span><span class="p">(</span><span class="n">example_spam_tokenized</span><span class="p">)</span>
+<span class="n">stemmed_eamil</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>'cellular phone accessori all At below wholesal price ! url hand free ear bud 1.99 ! phone holster 1.98 ! booster antenna onli $ 0.99 phone case 1.98 ! car charger 1.98 ! face plate As low As 0.99 ! lithium ion batteri As low As 6.94 ! url click below for accessori On all nokia , motorola LG , nextel , samsung , qualcomm , ericsson , audiovox phone At below wholesal price ! url ***if you need assist pleas call Us ( 732 ) 751-1457*** ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ To be remov from futur mail pleas send your remov request to : removemenow68994 @ btamail.net.cn thank you and have a super day : )'</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Write-a-sklearn-estimator-to-transform-our-email">
+<a class="anchor" href="#Write-a-sklearn-estimator-to-transform-our-email" aria-hidden="true"><span class="octicon octicon-link"></span></a>Write a sklearn estimator to transform our email<a class="anchor-link" href="#Write-a-sklearn-estimator-to-transform-our-email"> </a>
+</h2>
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.base</span> <span class="kn">import</span> <span class="n">BaseEstimator</span><span class="p">,</span> <span class="n">TransformerMixin</span>
+
+<span class="k">class</span> <span class="nc">EmailToTokenizedStemmed</span><span class="p">(</span><span class="n">BaseEstimator</span><span class="p">,</span> <span class="n">TransformerMixin</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">strip_headers</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">lower_case</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">remove_punctuation</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                 <span class="n">replace_urls</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">replace_numbers</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">stemming</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">strip_headers</span> <span class="o">=</span> <span class="n">strip_headers</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lower_case</span> <span class="o">=</span> <span class="n">lower_case</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">remove_punctuation</span> <span class="o">=</span> <span class="n">remove_punctuation</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">replace_urls</span> <span class="o">=</span> <span class="n">replace_urls</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">replace_numbers</span> <span class="o">=</span> <span class="n">replace_numbers</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stemming</span> <span class="o">=</span> <span class="n">stemming</span>
+        
+    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span>
+    
+    <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="n">X_transformed</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">email</span> <span class="ow">in</span> <span class="n">X</span><span class="p">:</span>
+            <span class="n">text</span> <span class="o">=</span> <span class="n">email_to_text</span><span class="p">(</span><span class="n">email</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">""</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">lower_case</span><span class="p">:</span>
+                <span class="n">text</span> <span class="o">=</span> <span class="n">text</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">replace_urls</span><span class="p">:</span>
+                <span class="n">url_pattern</span> <span class="o">=</span> <span class="s1">'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&amp;+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+'</span>
+                <span class="n">text</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="n">url_pattern</span><span class="p">,</span> <span class="s2">"URL"</span><span class="p">,</span> <span class="n">text</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">replace_numbers</span><span class="p">:</span>
+                <span class="n">text</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s1">'\d+(?:\.\d*(?:[eE]\d+))?'</span><span class="p">,</span> <span class="s1">'NUMBER'</span><span class="p">,</span> <span class="n">text</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">remove_punctuation</span><span class="p">:</span>
+                <span class="n">text</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s1">'[^a-zA-Z0-9]+'</span><span class="p">,</span> <span class="s1">' '</span><span class="p">,</span> <span class="n">text</span><span class="p">,</span> <span class="n">flags</span><span class="o">=</span><span class="n">re</span><span class="o">.</span><span class="n">M</span><span class="p">)</span>
+            <span class="n">text</span> <span class="o">=</span> <span class="n">word_tokenize</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+            <span class="n">text</span> <span class="o">=</span> <span class="n">stemming_email</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+            <span class="n">X_transformed</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">X_transformed</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Vectorizing">
+<a class="anchor" href="#Vectorizing" aria-hidden="true"><span class="octicon octicon-link"></span></a>Vectorizing<a class="anchor-link" href="#Vectorizing"> </a>
+</h2>
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.feature_extraction.text</span> <span class="kn">import</span> <span class="n">TfidfVectorizer</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Make-Pipeline">
+<a class="anchor" href="#Make-Pipeline" aria-hidden="true"><span class="octicon octicon-link"></span></a>Make Pipeline<a class="anchor-link" href="#Make-Pipeline"> </a>
+</h2>
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.pipeline</span> <span class="kn">import</span> <span class="n">Pipeline</span>
+
+<span class="n">email_pipeline</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">([</span>
+    <span class="p">(</span><span class="s2">"Tokenizing and Stemming"</span><span class="p">,</span> <span class="n">EmailToTokenizedStemmed</span><span class="p">()),</span>
+    <span class="p">(</span><span class="s2">"tf-idf Vectorizing"</span><span class="p">,</span> <span class="n">TfidfVectorizer</span><span class="p">()),</span>
+    <span class="p">(</span><span class="s2">"passthrough"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+<span class="p">])</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="The-processed-datasets">
+<a class="anchor" href="#The-processed-datasets" aria-hidden="true"><span class="octicon octicon-link"></span></a>The processed datasets<a class="anchor-link" href="#The-processed-datasets"> </a>
+</h2>
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">X_train_processed</span> <span class="o">=</span> <span class="n">email_pipeline</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">X_train</span><span class="p">)</span>
+<span class="n">X_test_processed</span> <span class="o">=</span> <span class="n">email_pipeline</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<hr>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="Modeling">
+<a class="anchor" href="#Modeling" aria-hidden="true"><span class="octicon octicon-link"></span></a>Modeling<a class="anchor-link" href="#Modeling"> </a>
+</h1>
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">StratifiedKFold</span><span class="p">,</span> <span class="n">RandomizedSearchCV</span>
+<span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">confusion_matrix</span><span class="p">,</span> <span class="n">classification_report</span>
+<span class="kn">from</span> <span class="nn">sklearn.naive_bayes</span> <span class="kn">import</span> <span class="n">MultinomialNB</span>
+<span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="kn">import</span> <span class="n">LogisticRegressionCV</span>
+<span class="kn">from</span> <span class="nn">sklearn.svm</span> <span class="kn">import</span> <span class="n">SVC</span>
+<span class="kn">from</span> <span class="nn">sklearn.ensemble</span> <span class="kn">import</span> <span class="n">RandomForestClassifier</span>
+
+<span class="c1"># plotting</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+<span class="o">%</span><span class="k">matplotlib</span> inline 
+
+<span class="c1"># others</span>
+<span class="kn">from</span> <span class="nn">scipy.stats</span> <span class="kn">import</span> <span class="n">uniform</span><span class="p">,</span> <span class="n">randint</span><span class="p">,</span> <span class="n">loguniform</span>
+<span class="kn">import</span> <span class="nn">joblib</span> <span class="c1"># storing models</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><strong>Functions from evaluating and comparing models</strong></p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">models</span> <span class="o">=</span> <span class="p">{}</span> <span class="c1"># storing trained models</span>
+<span class="n">models_names</span> <span class="o">=</span> <span class="p">[]</span> <span class="c1"># storing models names</span>
+
+<span class="c1"># add models and its name to dict</span>
+<span class="k">def</span> <span class="nf">add_model</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> 
+              <span class="n">models_list</span><span class="o">=</span><span class="n">models</span><span class="p">,</span>
+              <span class="n">name_list</span><span class="o">=</span><span class="n">models_names</span><span class="p">):</span>
+    <span class="n">name_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+    <span class="n">models_list</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">model</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">get_classification_report</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">X_test</span><span class="o">=</span><span class="n">X_test_processed</span><span class="p">,</span> <span class="n">y_test</span><span class="o">=</span><span class="n">y_test</span><span class="p">):</span>
+    <span class="n">y_pred</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">classification_report</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">,</span> 
+                                <span class="n">target_names</span><span class="o">=</span><span class="p">[</span><span class="s2">"not spam"</span><span class="p">,</span> <span class="s2">"spam"</span><span class="p">],</span>
+                                <span class="n">digits</span><span class="o">=</span><span class="mi">4</span><span class="p">))</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Building-models-and-tuning-them">
+<a class="anchor" href="#Building-models-and-tuning-them" aria-hidden="true"><span class="octicon octicon-link"></span></a>Building models and tuning them<a class="anchor-link" href="#Building-models-and-tuning-them"> </a>
+</h2>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>how I trained and tuned the models? what's the process?</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Naive-Bayes-(baseline-model)">
+<a class="anchor" href="#Naive-Bayes-(baseline-model)" aria-hidden="true"><span class="octicon octicon-link"></span></a>Naive Bayes (baseline model)<a class="anchor-link" href="#Naive-Bayes-(baseline-model)"> </a>
+</h3>
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">nb</span> <span class="o">=</span> <span class="n">MultinomialNB</span><span class="p">()</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train_processed</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">add_model</span><span class="p">(</span><span class="s2">"Naive Bayes"</span><span class="p">,</span> <span class="n">nb</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Logistic-regression">
+<a class="anchor" href="#Logistic-regression" aria-hidden="true"><span class="octicon octicon-link"></span></a>Logistic regression<a class="anchor-link" href="#Logistic-regression"> </a>
+</h3>
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">logitCV</span> <span class="o">=</span> <span class="n">LogisticRegressionCV</span><span class="p">(</span><span class="n">max_iter</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span>
+                               <span class="n">Cs</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">cv</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+                               <span class="n">scoring</span><span class="o">=</span><span class="s2">"accuracy"</span><span class="p">)</span>
+<span class="n">logitCV</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train_processed</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>LogisticRegressionCV(Cs=20, class_weight=None, cv=10, dual=False,
+                     fit_intercept=True, intercept_scaling=1.0, l1_ratios=None,
+                     max_iter=1000, multi_class='auto', n_jobs=None,
+                     penalty='l2', random_state=None, refit=True,
+                     scoring='accuracy', solver='lbfgs', tol=0.0001, verbose=0)</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">add_model</span><span class="p">(</span><span class="s2">"Logistic regression"</span><span class="p">,</span> <span class="n">logitCV</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="SVM">
+<a class="anchor" href="#SVM" aria-hidden="true"><span class="octicon octicon-link"></span></a>SVM<a class="anchor-link" href="#SVM"> </a>
+</h3>
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">svc</span> <span class="o">=</span> <span class="n">SVC</span><span class="p">()</span>
+<span class="n">svc_params</span> <span class="o">=</span> <span class="p">{</span><span class="s1">'C'</span><span class="p">:</span> <span class="n">loguniform</span><span class="p">(</span><span class="mf">1e0</span><span class="p">,</span> <span class="mf">1e3</span><span class="p">),</span>
+              <span class="s1">'gamma'</span><span class="p">:</span> <span class="n">loguniform</span><span class="p">(</span><span class="mf">1e-4</span><span class="p">,</span> <span class="mf">1e-3</span><span class="p">),</span>
+              <span class="s1">'kernel'</span><span class="p">:</span> <span class="p">[</span><span class="s1">'rbf'</span><span class="p">],</span>
+              <span class="s1">'class_weight'</span><span class="p">:[</span><span class="s1">'balanced'</span><span class="p">,</span> <span class="kc">None</span><span class="p">]}</span>
+<span class="n">svc_grid</span> <span class="o">=</span> <span class="n">RandomizedSearchCV</span><span class="p">(</span><span class="n">svc</span><span class="p">,</span> <span class="n">svc_params</span><span class="p">,</span> 
+                              <span class="n">n_jobs</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">cv</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+                              <span class="n">n_iter</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span> <span class="n">scoring</span><span class="o">=</span><span class="s2">"accuracy"</span><span class="p">)</span>
+
+<span class="n">svc_grid</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train_processed</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+
+<span class="n">svc_best</span> <span class="o">=</span> <span class="n">svc_grid</span><span class="o">.</span><span class="n">best_estimator_</span>
+
+<span class="c1">#svc = joblib.load("tmp/svc.pkl")</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">svc</span><span class="o">.</span><span class="n">get_params</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>{'C': 280.3887191550727,
+ 'break_ties': False,
+ 'cache_size': 200,
+ 'class_weight': 'balanced',
+ 'coef0': 0.0,
+ 'decision_function_shape': 'ovr',
+ 'degree': 3,
+ 'gamma': 0.000984422644629166,
+ 'kernel': 'rbf',
+ 'max_iter': -1,
+ 'probability': False,
+ 'random_state': None,
+ 'shrinking': True,
+ 'tol': 0.001,
+ 'verbose': False}</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">add_model</span><span class="p">(</span><span class="s2">"SVM"</span><span class="p">,</span> <span class="n">svc</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Random-Forest">
+<a class="anchor" href="#Random-Forest" aria-hidden="true"><span class="octicon octicon-link"></span></a>Random Forest<a class="anchor-link" href="#Random-Forest"> </a>
+</h3>
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">max_depths</span> <span class="o">=</span> <span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">150</span><span class="p">]</span>
+<span class="k">for</span> <span class="n">depth</span> <span class="ow">in</span> <span class="n">max_depths</span><span class="p">:</span>
+    <span class="n">rf</span> <span class="o">=</span> <span class="n">RandomForestClassifier</span><span class="p">(</span><span class="n">n_jobs</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">oob_score</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> 
+                                <span class="n">n_estimators</span><span class="o">=</span><span class="mi">1500</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">44</span><span class="p">,</span>
+                                <span class="n">max_depth</span><span class="o">=</span><span class="n">depth</span><span class="p">)</span>
+    <span class="n">rf</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train_processed</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Max Depth: </span><span class="si">{</span><span class="n">depth</span><span class="si">:</span><span class="s2">3</span><span class="si">}</span><span class="s2">, oob accuracy: </span><span class="si">{</span><span class="n">rf</span><span class="o">.</span><span class="n">oob_score_</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Max Depth:  10, oob accuracy: 0.8594
+Max Depth:  50, oob accuracy: 0.9692
+Max Depth: 100, oob accuracy: 0.9711
+Max Depth: 150, oob accuracy: 0.9694
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">max_depths</span> <span class="o">=</span> <span class="p">[</span><span class="mi">90</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">110</span><span class="p">,</span> <span class="mi">120</span><span class="p">,</span> <span class="mi">130</span><span class="p">]</span>
+<span class="k">for</span> <span class="n">depth</span> <span class="ow">in</span> <span class="n">max_depths</span><span class="p">:</span>
+    <span class="n">rf</span> <span class="o">=</span> <span class="n">RandomForestClassifier</span><span class="p">(</span><span class="n">n_jobs</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">oob_score</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> 
+                                <span class="n">n_estimators</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">44</span><span class="p">,</span>
+                                <span class="n">max_depth</span><span class="o">=</span><span class="n">depth</span><span class="p">)</span>
+    <span class="n">rf</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train_processed</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Max Depth: </span><span class="si">{</span><span class="n">depth</span><span class="si">:</span><span class="s2">3</span><span class="si">}</span><span class="s2">, oob accuracy: </span><span class="si">{</span><span class="n">rf</span><span class="o">.</span><span class="n">oob_score_</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Max Depth:  90, oob accuracy: 0.9700
+Max Depth: 100, oob accuracy: 0.9711
+Max Depth: 110, oob accuracy: 0.9704
+Max Depth: 120, oob accuracy: 0.9708
+Max Depth: 130, oob accuracy: 0.9698
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">rf</span> <span class="o">=</span> <span class="n">RandomForestClassifier</span><span class="p">(</span><span class="n">n_jobs</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">oob_score</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> 
+                            <span class="n">n_estimators</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">44</span><span class="p">,</span>
+                            <span class="n">max_depth</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+<span class="n">rf</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train_processed</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>RandomForestClassifier(bootstrap=True, ccp_alpha=0.0, class_weight=None,
+                       criterion='gini', max_depth=100, max_features='auto',
+                       max_leaf_nodes=None, max_samples=None,
+                       min_impurity_decrease=0.0, min_impurity_split=None,
+                       min_samples_leaf=1, min_samples_split=2,
+                       min_weight_fraction_leaf=0.0, n_estimators=1000,
+                       n_jobs=-1, oob_score=True, random_state=44, verbose=0,
+                       warm_start=False)</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">add_model</span><span class="p">(</span><span class="s2">"Random forest"</span><span class="p">,</span> <span class="n">rf</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Evaluate-on-test-set">
+<a class="anchor" href="#Evaluate-on-test-set" aria-hidden="true"><span class="octicon octicon-link"></span></a>Evaluate on test set<a class="anchor-link" href="#Evaluate-on-test-set"> </a>
+</h2>
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">models_names</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+    <span class="n">get_classification_report</span><span class="p">(</span><span class="n">models</span><span class="p">[</span><span class="n">name</span><span class="p">])</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"-----------------------------------------"</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Naive Bayes
+              precision    recall  f1-score   support
+
+    not spam     0.8494    0.9988    0.9181       830
+        spam     0.9957    0.6132    0.7590       380
+
+    accuracy                         0.8777      1210
+   macro avg     0.9226    0.8060    0.8385      1210
+weighted avg     0.8953    0.8777    0.8681      1210
+
+-----------------------------------------
+
+Logistic regression
+              precision    recall  f1-score   support
+
+    not spam     0.9927    0.9880    0.9903       830
+        spam     0.9740    0.9842    0.9791       380
+
+    accuracy                         0.9868      1210
+   macro avg     0.9833    0.9861    0.9847      1210
+weighted avg     0.9868    0.9868    0.9868      1210
+
+-----------------------------------------
+
+SVM
+              precision    recall  f1-score   support
+
+    not spam     0.9891    0.9880    0.9885       830
+        spam     0.9738    0.9763    0.9750       380
+
+    accuracy                         0.9843      1210
+   macro avg     0.9814    0.9821    0.9818      1210
+weighted avg     0.9843    0.9843    0.9843      1210
+
+-----------------------------------------
+
+Random forest
+              precision    recall  f1-score   support
+
+    not spam     0.9776    0.9976    0.9875       830
+        spam     0.9945    0.9500    0.9717       380
+
+    accuracy                         0.9826      1210
+   macro avg     0.9860    0.9738    0.9796      1210
+weighted avg     0.9829    0.9826    0.9825      1210
+
+-----------------------------------------
+
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Comparing-performance-of-models-using-ROC-curve-and-AUC">
+<a class="anchor" href="#Comparing-performance-of-models-using-ROC-curve-and-AUC" aria-hidden="true"><span class="octicon octicon-link"></span></a>Comparing performance of models using ROC curve and AUC<a class="anchor-link" href="#Comparing-performance-of-models-using-ROC-curve-and-AUC"> </a>
+</h2>
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">roc_curve</span><span class="p">,</span> <span class="n">roc_auc_score</span>
+
+<span class="k">def</span> <span class="nf">plot_roc_curve</span><span class="p">(</span><span class="n">models_names</span><span class="o">=</span><span class="n">models_names</span><span class="p">,</span> <span class="n">models</span><span class="o">=</span><span class="n">models</span><span class="p">):</span>
+    
+    <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">dpi</span><span class="o">=</span><span class="mi">120</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">models_names</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="o">==</span> <span class="s2">"SVM"</span><span class="p">:</span>
+            <span class="n">y_score</span> <span class="o">=</span> <span class="n">models</span><span class="p">[</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">decision_function</span><span class="p">(</span><span class="n">X_test_processed</span><span class="p">)</span>
+            <span class="n">fpr</span><span class="p">,</span> <span class="n">tpr</span><span class="p">,</span> <span class="n">thresholds</span> <span class="o">=</span> <span class="n">roc_curve</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">y_score</span><span class="p">)</span>
+            <span class="n">auc</span> <span class="o">=</span> <span class="n">roc_auc_score</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">y_score</span><span class="p">)</span>
+            <span class="n">label</span> <span class="o">=</span> <span class="n">name</span> <span class="o">+</span> <span class="sa">f</span><span class="s2">"(</span><span class="si">{</span><span class="n">auc</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">)"</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">fpr</span><span class="p">,</span> <span class="n">tpr</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">y_score</span> <span class="o">=</span> <span class="n">models</span><span class="p">[</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">predict_proba</span><span class="p">(</span><span class="n">X_test_processed</span><span class="p">)[:,</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">fpr</span><span class="p">,</span> <span class="n">tpr</span><span class="p">,</span> <span class="n">thresholds</span> <span class="o">=</span> <span class="n">roc_curve</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">y_score</span><span class="p">)</span>
+            <span class="n">auc</span> <span class="o">=</span> <span class="n">roc_auc_score</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">y_score</span><span class="p">)</span>
+            <span class="n">label</span> <span class="o">=</span> <span class="n">name</span> <span class="o">+</span> <span class="sa">f</span><span class="s2">"(</span><span class="si">{</span><span class="n">auc</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">)"</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">fpr</span><span class="p">,</span> <span class="n">tpr</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span> <span class="s2">"b--"</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">(</span><span class="o">-</span><span class="mf">0.01</span><span class="p">,</span> <span class="mf">1.02</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">(</span><span class="o">-</span><span class="mf">0.01</span><span class="p">,</span> <span class="mf">1.02</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s2">"Model (AUC score)"</span><span class="p">,</span><span class="n">loc</span><span class="o">=</span><span class="p">(</span><span class="mf">1.01</span><span class="p">,</span> <span class="mf">0.4</span><span class="p">))</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">plot_roc_curve</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+
+<div class="output_png output_subarea ">
+<img src="data:image/png;base64,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%0A">
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="Conclusion">
+<a class="anchor" href="#Conclusion" aria-hidden="true"><span class="octicon octicon-link"></span></a>Conclusion<a class="anchor-link" href="#Conclusion"> </a>
+</h1>
+</div>
+</div>
+</div>
+</div>
+
+
+
+  </div><!-- from https://github.com/utterance/utterances -->
+<script src="https://utteranc.es/client.js"
+        repo="peiyiHong/my-blog"
+        issue-term="title"
+        label="blogpost-comment"
+        theme="github-light"
+        crossorigin="anonymous"
+        async>
+</script><a class="u-url" href="/my-blog/project/machine%20learning/classification/2020/09/12/Apache-Spam-Classifier.html" hidden></a>
+</article>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/my-blog/"></data>
+
+  <div class="wrapper">
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        <p class="feed-subscribe">
+          <a href="/my-blog/feed.xml">
+            <svg class="svg-icon orange">
+              <use xlink:href="/my-blog/assets/minima-social-icons.svg#rss"></use>
+            </svg><span>Subscribe</span>
+          </a>
+        </p>
+      </div>
+      <div class="footer-col">
+        <p></p>
+      </div>
+    </div>
+
+    <div class="social-links"><ul class="social-media-list"><li><a rel="me" href="https://github.com/peiyiHong" title="peiyiHong"><svg class="svg-icon grey"><use xlink:href="/my-blog/assets/minima-social-icons.svg#github"></use></svg></a></li></ul>
+</div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>
