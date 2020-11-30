@@ -1,11 +1,15 @@
 ---
 layout: page
-title: About Me
+title: About
 permalink: /about/
 ---
 
-This website is powered by **[fastpages](https://github.com/fastai/fastpages)** [^1].
+## Who am I ?
 
+My name is Peiyi Hong (洪培翊).
 
+## Contect me
 
-[^1]:a blogging platform that natively supports Jupyter notebooks in addition to other formats.
+* Email
+* Github
+* Linkedin
