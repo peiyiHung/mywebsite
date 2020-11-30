@@ -1,1 +1,1 @@
-Sitemap: https://peiyihung.github.io/mywebsite/sitemap.xml
+Sitemap: https://peiyihong.github.io/my-blog/sitemap.xml
