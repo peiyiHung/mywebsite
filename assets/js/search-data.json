@@ -63,8 +63,8 @@
 
   
       ,"page1": {
-          "title": "About Me",
-          "content": "This website is powered by fastpages 1. . a blogging platform that natively supports Jupyter notebooks in addition to other formats. &#8617; . |",
+          "title": "About",
+          "content": "Who am I ? . My name is Peiyi Hong (洪培翊). . Contect me . Email | Github | Linkedin | .",
           "url": "https://peiyihung.github.io/mywebsite/about/",
           "relUrl": "/about/",
           "date": ""
@@ -75,6 +75,28 @@
   
 
   
+      ,"page3": {
+          "title": "Learning",
+          "content": "My Learning Notes . What&#39;s the difference between a metric and a loss? . . Nov 29, 2020 . | .",
+          "url": "https://peiyihung.github.io/mywebsite/learning/",
+          "relUrl": "/learning/",
+          "date": ""
+      }
+      
+  
+
+  
+      ,"page4": {
+          "title": "Projects",
+          "content": "My Projects . Interactive Visualization Female College Majors with Altair . . Sep 24, 2020 . | Analyzing Sharing Bikes Usage Trends . A exploratory data analysis project answering questions about bike shiring. . Sep 16, 2020 . | A Spam Classifier . This project builds a spam classifier using Apache SpamAssassin&#39;s public datasets. . Sep 12, 2020 . | .",
+          "url": "https://peiyihung.github.io/mywebsite/projects/",
+          "relUrl": "/projects/",
+          "date": ""
+      }
+      
+  
+
+  
   
 
   
@@ -94,7 +116,7 @@
   
 
   
-      ,"page10": {
+      ,"page12": {
           "title": "",
           "content": "Sitemap: {{ “sitemap.xml” | absolute_url }} | .",
           "url": "https://peiyihung.github.io/mywebsite/robots.txt",
