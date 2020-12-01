@@ -437,7 +437,7 @@ pre code { font-size: 15px !important; }
 
 .input_area pre { border-left: 1px solid lightcoral; }
 
-.output_area pre { border-left: 1px solid grey; margin-left: 1rem !important; font-size: 16px; }
+.output_area pre { margin-left: 1rem !important; font-size: 16px; }
 
 .code_cell table { width: auto; }
 
