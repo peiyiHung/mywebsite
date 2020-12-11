@@ -92,7 +92,7 @@ window.onload = wrap_img;
        • <span class="read-time" title="Estimated read time">
     
     
-      3 min read
+      4 min read
     
 </span></p>
 
@@ -160,13 +160,8 @@ window.onload = wrap_img;
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>In this project, I make some simple interactive graphs to show annual changes in proportions of female college major in different disciplines. The data I used is obtained from <a href="http://nces.ed.gov/programs/digest/2013menu_tables.asp">The Department of Education Statistics</a>. It contains the proportions of female college majors in 17 disciplines in each year from 1970 to 2011. To make these analysis more easily understood, I will split these disciplines into three groups: STEM, Liberal Arts and the others, and plot each disciplines in these three groups.</p>
-<p>I use Python for this project. The programming tool I used for visualizing the data is Altair, a declarative statistical visualization library for Python. You can find the source code on <a href="http://github.com/altair-viz/altair">GitHub</a>.</p>
-<p>This project consists of three parts:</p>
-<ul>
-<li>a preview of our data to gain a brief understanding</li>
-<li>preprocessing to make the data easier to be visualized</li>
-<li>making interactive graphs to discovery information</li>
-</ul>
+<p>I use Python for this project. The programming tool I used for visualizing the data is Altair, a declarative statistical visualization library for Python.</p>
+<p>This project consists of three parts. First, we will have a preview of our data to gain a brief understanding og it. Secondly, we process the data to make it easier to be visualized. Lastly, we make interactive graphs to discovery information from the data.</p>
 
 </div>
 </div>
@@ -301,6 +296,15 @@ window.onload = wrap_img;
 </div>
     
 
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>We can clearly see that the data contains the percentage of female students in each disciplines.
+Each row represents a year, and columns indicate the diciplines. Here's a lists of disciplines:</p>
+
+</div>
+</div>
+</div>
     
     
 <div class="cell border-box-sizing code_cell rendered">
@@ -351,9 +355,31 @@ window.onload = wrap_img;
 <div class="cell border-box-sizing text_cell rendered">
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
+<p>In this part, we tidy the data and divide disciplines into three groups.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
 <h2 id="Tidying-the-data">
 <a class="anchor" href="#Tidying-the-data" aria-hidden="true"><span class="octicon octicon-link"></span></a>Tidying the data<a class="anchor-link" href="#Tidying-the-data"> </a>
 </h2>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>In order to easily visualize the data, we transform our data to a tidy data. But What's a tidy data? By the definition from Hadley Wickham's <a href="https://www.jstatsoft.org/article/view/v059i10">paper</a>, a tidy data is</p>
+<ol>
+<li>Each variable forms a column.</li>
+<li>Each observation forms a row.</li>
+<li>Each type of observational unit forms a table</li>
+</ol>
+<p>We can use <code>melt</code> data to do that.</p>
+
 </div>
 </div>
 </div>
@@ -486,6 +512,14 @@ window.onload = wrap_img;
 </div>
 </div>
 </div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Since there are 18 disciplines in the data, it would be messy if we plot all disciplines at once in our graph. Consequently, we group dsciplines into three groups, STEM, Liberal Arts and the others, and add a type column to store group information.</p>
+
+</div>
+</div>
+</div>
     
     
 <div class="cell border-box-sizing code_cell rendered">
@@ -609,6 +643,14 @@ window.onload = wrap_img;
 <h1 id="Plotting">
 <a class="anchor" href="#Plotting" aria-hidden="true"><span class="octicon octicon-link"></span></a>Plotting<a class="anchor-link" href="#Plotting"> </a>
 </h1>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>We start visualizing the data in this section. Every groups in this section are interactive. You can point to a data point in the graphs to see the detailed information of the data point. Further, you can click a label in the legend on the right to observe the trend of certain type or discipline.</p>
+
 </div>
 </div>
 </div>
