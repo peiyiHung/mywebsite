@@ -4,7 +4,5 @@ title: About
 permalink: /about/
 ---
 
-## Who am I ?
-
-My name is Peiyi Hong (洪培翊).
+My name is Peiyi Hung (洪培翊).
 
