@@ -127,8 +127,8 @@ window.onload = wrap_img;
 <div class="cell border-box-sizing text_cell rendered">
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>In machine learning, there are usually two values used to evaluate our model: a metric and a loss. For instance, if we are doing a binary classification task, our metric may be the accuracy and our loss would be the cross-entroy. They both show how good our model 
-performs. However, why do we need both rather than just use one of them? Furthermore, what's the difference between them?</p>
+<p>In machine learning, we usually use two values to evaluate our model: a metric and a loss. For instance, if we are doing a binary classification task, our metric may be the accuracy and our loss would be the cross-entroy. They both show how good our model 
+performs. However, why do we need both rather than just use one of them? Also, what's the difference between them?</p>
 
 </div>
 </div>
@@ -144,7 +144,7 @@ performs. However, why do we need both rather than just use one of them? Further
 <div class="cell border-box-sizing text_cell rendered">
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>Based on the metric, machine learning practitioners such as data scientists and researchers assess a machine learning model. On the assessment, ML practitioners make decisions to address their problems or achieve their business goals. For example , say a data scientist aims to build a spam classifier to distinguish normal email from spam with 95% accuracy. First, the data scientist bulid a logistic regression model with 90% accuracy. Apparently, this result doesn't meet his business goal, so he tries to build another model. After training a random forest model, he get a classifier with 97% accuracy, which goes beyond his goal. Since the goal is met, the data scientist decides to integrate this model into his data product. ML partitioners use the metric to tell whether their model is good enough.</p>
+<p>Based on the metric, machine learning practitioners such as data scientists and researchers assess a machine learning model. On the assessment, ML practitioners make decisions to address their problems or achieve their business goals. For example , say a data scientist aims to build a spam classifier to distinguish normal email from spam with 95% accuracy. First, the data scientist build a model with 90% accuracy. Apparently, this result doesn't meet his business goal, so he tries to build a better one. After implementing some techniques, he might get a classifier with 97% accuracy, which goes beyond his goal. Since the goal is met, the data scientist decides to integrate this model into his data product. ML partitioners use the metric to tell whether their model is good enough.</p>
 
 </div>
 </div>
@@ -152,14 +152,14 @@ performs. However, why do we need both rather than just use one of them? Further
 <div class="cell border-box-sizing text_cell rendered">
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>On the other hand, a loss indicates in what direction your model should improve. The difference between machine learning and traditional programming is how they get the ability to solve a problem. Traditional programs solve problems by following exact instructions given by programmers. On the contrary, a machine learning models learn that by taking into some examples (data) and discovery the underlying patterns. How does a machine learning model do that? Most ML models learn from a gradient-based method. Here's how a gradient-based method (be specifically, a gradient descent method in supervised learning context) works:</p>
+<p>On the other hand, a loss indicates in what direction your model should improve. The difference between machine learning and traditional programming is how they get the ability to solve a problem. Traditional programs solve problems by following exact instructions given by programmers. In contrast, machine learning models learn how to solve a problem by taking into some examples (data) and discovering the underlying patterns of the problem. How does a machine learning model learn? Most ML models learn using a gradient-based method. Here's how a gradient-based method (be specifically, a gradient descent method in supervised learning context) works:</p>
 <ol>
 <li>A model takes into data and makes predictions.</li>
-<li>Compute a loss based on the predictions and the true data.</li>
+<li>Compute the loss based on the predictions and the true data.</li>
 <li>Compute the gradients of the loss with respect to parameters of the model.</li>
 <li>Updating these parameters based on these gradients.</li>
 </ol>
-<p>The gradient of the loss helps our model to get better and better. The reason why we need a loss is that it is <strong>sensitive</strong> enough to small changes so our model can improve. More precisely, the gradient of the loss should vary if our parameters change slightly. In our spam classification example, accuracy is obviously not suitable for being a loss since it only changes when some examples are classified differently. The cross-entrpy is relatively smoother and so it is a good candidate for a loss. However, a metric do not have to be different from a loss. A metric can be a loss as long as it is sensitive enough. For instance, in a regression setting, MSE (mean squared error) can be both a metric and a loss.</p>
+<p>The gradient of the loss helps our model to get better and better. The reason why we need a loss is that a loss is <strong>sensitive</strong> enough to small changes so our model can improve based on it. More precisely, the gradient of the loss should vary if our parameters change slightly. In our spam classification example, accuracy is obviously not suitable for being a loss since it only changes when some examples are classified differently. The cross-entrpy is relatively smoother and so it is a good candidate for a loss. However, a metric do not have to be different from a loss. A metric can be a loss as long as it is sensitive enough. For instance, in a regression setting, MSE (mean squared error) can be both a metric and a loss.</p>
 
 </div>
 </div>
