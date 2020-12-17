@@ -8,8 +8,3 @@ permalink: /about/
 
 My name is Peiyi Hong (洪培翊).
 
-## Contect me
-
-* Email
-* Github
-* Linkedin
