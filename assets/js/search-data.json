@@ -99,7 +99,7 @@
   
       ,"page3": {
           "title": "Learning",
-          "content": "My Learning Notes . [ML]: General machine learning concepts and algorithms other than neueal network . [DL]: Deep learning . [STAT]: Statistics and probability . [ALDS]: Algorithms and Data Structures . [DL] AlexNet . An introduction to AlexNet . Dec 18, 2020 . | Why do we need nonlinear activation functions in a neural network ? . Explaining why we need nonlinear activation fucntions and illutrating it with python code . Dec 16, 2020 . | What&#39;s the difference between a metric and a loss? . . Dec 6, 2020 . | .",
+          "content": "My Learning Notes . [DL] AlexNet . An introduction to AlexNet . Dec 18, 2020 . | Why do we need nonlinear activation functions in a neural network ? . Explaining why we need nonlinear activation fucntions and illutrating it with python code . Dec 16, 2020 . | What&#39;s the difference between a metric and a loss? . . Dec 6, 2020 . | .",
           "url": "https://peiyihung.github.io/mywebsite/learning/",
           "relUrl": "/learning/",
           "date": ""
