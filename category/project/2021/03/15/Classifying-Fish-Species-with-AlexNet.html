@@ -14,10 +14,11 @@
 <link rel="canonical" href="https://peiyihung.github.io/mywebsite/category/project/2021/03/15/Classifying-Fish-Species-with-AlexNet.html" />
 <meta property="og:url" content="https://peiyihung.github.io/mywebsite/category/project/2021/03/15/Classifying-Fish-Species-with-AlexNet.html" />
 <meta property="og:site_name" content="PeiyiHung" />
+<meta property="og:image" content="https://peiyihung.github.io/mywebsite/images/fishes.png" />
 <meta property="og:type" content="article" />
 <meta property="article:published_time" content="2021-03-15T00:00:00-05:00" />
 <script type="application/ld+json">
-{"url":"https://peiyihung.github.io/mywebsite/category/project/2021/03/15/Classifying-Fish-Species-with-AlexNet.html","@type":"BlogPosting","headline":"Classifiying Fish Spieces with AlexNet","dateModified":"2021-03-15T00:00:00-05:00","datePublished":"2021-03-15T00:00:00-05:00","mainEntityOfPage":{"@type":"WebPage","@id":"https://peiyihung.github.io/mywebsite/category/project/2021/03/15/Classifying-Fish-Species-with-AlexNet.html"},"author":{"@type":"Person","name":"Peiyi Hung"},"description":"Build AlexNet with Pytorch and use it to recognize fish spieces","@context":"https://schema.org"}</script>
+{"url":"https://peiyihung.github.io/mywebsite/category/project/2021/03/15/Classifying-Fish-Species-with-AlexNet.html","@type":"BlogPosting","headline":"Classifiying Fish Spieces with AlexNet","dateModified":"2021-03-15T00:00:00-05:00","datePublished":"2021-03-15T00:00:00-05:00","image":"https://peiyihung.github.io/mywebsite/images/fishes.png","mainEntityOfPage":{"@type":"WebPage","@id":"https://peiyihung.github.io/mywebsite/category/project/2021/03/15/Classifying-Fish-Species-with-AlexNet.html"},"author":{"@type":"Person","name":"Peiyi Hung"},"description":"Build AlexNet with Pytorch and use it to recognize fish spieces","@context":"https://schema.org"}</script>
 <!-- End Jekyll SEO tag -->
 <link rel="stylesheet" href="/mywebsite/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="https://peiyihung.github.io/mywebsite/feed.xml" title="PeiyiHung" /><link rel="shortcut icon" type="image/x-icon" href="/mywebsite/images/favicon.ico"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Primer/15.2.0/primer.css" integrity="sha512-xTz2ys4coGAOz8vuV1NcQBkgVmKhsSEtjbqyMJbBHRplFuvKIUo6xhLHpAyPt9mfR6twHJgn9OgVLuqOvjeBhg==" crossorigin="anonymous" />
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css" integrity="sha512-1PKOgIY59xJ8Co8+NE6FZ+LOAZKjy+KY8iq0G4B3CyeY6wYHN3yt9PW0XpSriVlkMXe40PTKnXrLnZ9+fkDaog==" crossorigin="anonymous" />
@@ -96,7 +97,7 @@ window.onload = wrap_img;
        • <span class="read-time" title="Estimated read time">
     
     
-      1 min read
+      2 min read
     
 </span></p>
 
@@ -156,29 +157,20 @@ window.onload = wrap_img;
 
 <div class="container" id="notebook-container">
         
-    
-    
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span> 
-</pre></div>
-
-    </div>
-</div>
-</div>
-
-</div>
-    
-
 <div class="cell border-box-sizing text_cell rendered">
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h1 id="Get-the-data">
 <a class="anchor" href="#Get-the-data" aria-hidden="true"><span class="octicon octicon-link"></span></a>Get the data<a class="anchor-link" href="#Get-the-data"> </a>
 </h1>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>from kaggle, use kaggle api</p>
+
 </div>
 </div>
 </div>
@@ -270,6 +262,14 @@ window.onload = wrap_img;
 </div>
 </div>
 </div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Find image files and split train and test set</p>
+
+</div>
+</div>
+</div>
     
     
 <div class="cell border-box-sizing code_cell rendered">
@@ -296,6 +296,9 @@ window.onload = wrap_img;
 <span class="n">fish_files</span> <span class="o">=</span> <span class="p">[]</span>
 <span class="k">for</span> <span class="n">fish</span> <span class="ow">in</span> <span class="n">fish_data_path</span><span class="p">:</span>
     <span class="n">fish_files</span> <span class="o">+=</span> <span class="n">get_image_files</span><span class="p">(</span><span class="n">fish</span><span class="p">)</span>
+
+<span class="c1"># split train and test set</span>
+<span class="n">train_idx</span><span class="p">,</span> <span class="n">test_idx</span> <span class="o">=</span> <span class="n">RandomSplitter</span><span class="p">()(</span><span class="n">fish_files</span><span class="p">)</span>
 </pre></div>
 
     </div>
@@ -305,23 +308,14 @@ window.onload = wrap_img;
 </div>
     
 
-    
-    
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-
+<div class="cell border-box-sizing text_cell rendered">
 <div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">train_idx</span><span class="p">,</span> <span class="n">test_idx</span> <span class="o">=</span> <span class="n">RandomSplitter</span><span class="p">()(</span><span class="n">fish_files</span><span class="p">)</span>
-</pre></div>
-
-    </div>
-</div>
-</div>
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>dataloaders, resize, data augmentation, normalize</p>
 
 </div>
-    
-
+</div>
+</div>
     
     
 <div class="cell border-box-sizing code_cell rendered">
@@ -381,7 +375,7 @@ window.onload = wrap_img;
 <div class="cell border-box-sizing text_cell rendered">
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>Test dl</p>
+<p>test dataloader</p>
 
 </div>
 </div>
@@ -415,7 +409,7 @@ window.onload = wrap_img;
 <div class="cell border-box-sizing text_cell rendered">
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>AlexNet with batchnormalization</p>
+<p>AlexNet with batchnormalization, it's essential to add batch normalization when training a deep neural net</p>
 
 </div>
 </div>
@@ -465,6 +459,14 @@ window.onload = wrap_img;
 </div>
     
 
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>wrap into a learner - dls, model, Adam, cross-entropy, accuracy</p>
+
+</div>
+</div>
+</div>
     
     
 <div class="cell border-box-sizing code_cell rendered">
@@ -648,6 +650,14 @@ window.onload = wrap_img;
 </div>
     
 
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>evaluate model on test set</p>
+
+</div>
+</div>
+</div>
     
     
 <div class="cell border-box-sizing code_cell rendered">
@@ -762,6 +772,14 @@ window.onload = wrap_img;
 <h1 id="Transfer-Learning">
 <a class="anchor" href="#Transfer-Learning" aria-hidden="true"><span class="octicon octicon-link"></span></a>Transfer Learning<a class="anchor-link" href="#Transfer-Learning"> </a>
 </h1>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>pretrained model</p>
+
 </div>
 </div>
 </div>
@@ -913,6 +931,14 @@ window.onload = wrap_img;
 </div>
     
 
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>evaluate on test set</p>
+
+</div>
+</div>
+</div>
     
     
 <div class="cell border-box-sizing code_cell rendered">
