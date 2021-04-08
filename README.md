@@ -6,7 +6,7 @@
 
 https://peiyihung.github.io/mywebsite/
 
-# My Blog
+# My Website
 
 
 _powered by [fastpages](https://github.com/fastai/fastpages)_
