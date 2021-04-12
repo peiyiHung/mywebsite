@@ -97,7 +97,7 @@ window.onload = wrap_img;
        • <span class="read-time" title="Estimated read time">
     
     
-      9 min read
+      11 min read
     
 </span></p>
 
@@ -175,8 +175,9 @@ window.onload = wrap_img;
 <div class="cell border-box-sizing text_cell rendered">
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>I like books and, as an aspiring data scientist, I must learn Machine Learning. ML books are fascinating to me and, thus, I do a project on predicting prices of ML books to sharpen my practical ML skill. This post shows how I explore the data on Machine Learning books and make models to predict prices of Machine Learning books.</p>
-<p>I obtain the data by scraping <a href="https://www.bookdepository.com/">book depository</a>. The web scraping process are documented in notebooks stored the project's <a href="https://github.com/peiyiHung/Predicting-prices-of-ML-books">repository</a>.</p>
+<p>I like books and, as an aspiring data scientist, I must learn Machine Learning (ML). ML books are fascinating to me and, thus, I do a project on predicting prices of ML books to sharpen my practical ML skill. This post shows how I explore the data on Machine Learning books and make models to predict prices of Machine Learning books.</p>
+<p>The data I used in this project was obtained by scraping <a href="https://www.bookdepository.com/">book depository</a>. The web scraping process are documented in notebooks stored this project's <a href="https://github.com/peiyiHung/Predicting-prices-of-ML-books">repository</a>. The data contains 18 variables, each of which indicates a attribute of a book such as title, author, price, etc.</p>
+<p>This project starts with importing data, getting basic information of the data, and some basic preprocessing with Pandas. After that, I conducted exploratory data analysis, in which I computed statistics and made graphs to get insights on the data with Matplotlib and Seaborn. Lastly, I built machine learning models to predict books prices with Scikit-learn and fastai.</p>
 
 </div>
 </div>
@@ -1277,6 +1278,14 @@ Name: Publication Country, dtype: int64</pre>
 <div class="cell border-box-sizing text_cell rendered">
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
+<p>This section consists of two parts: preprocessing and modeling. In proceessing stage, I dealt with missing values by imputation and split the data set into training and test set. In the modeling stage, I first decide to use rooted mean squared error(rmse)as metric, and the use the mean of <code>Price</code> to predict book prices as a baseline method. Next, I built machine learning models including linear regrssion, random forest and neural network, and used cross-validtion to tune the hyperparameters of the first two models.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
 <h2 id="Preprocessing">
 <a class="anchor" href="#Preprocessing" aria-hidden="true"><span class="octicon octicon-link"></span></a>Preprocessing<a class="anchor-link" href="#Preprocessing"> </a>
 </h2>
@@ -1287,6 +1296,14 @@ Name: Publication Country, dtype: int64</pre>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p><strong>Deal with missing values</strong></p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>I impute the missing values in numeraical variables with median which is commonly used and more robust than mean.</p>
 
 </div>
 </div>
@@ -1309,6 +1326,14 @@ Name: Publication Country, dtype: int64</pre>
 </div>
     
 
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><code>Language</code> contains only 7 missing values and I replace these values with the most frequent value, "English".</p>
+
+</div>
+</div>
+</div>
     
     
 <div class="cell border-box-sizing code_cell rendered">
@@ -1326,6 +1351,14 @@ Name: Publication Country, dtype: int64</pre>
 </div>
     
 
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Since there are almost 1000 missing values in <code>Publication City</code> and <code>Publication Country</code>, it might be inappropriate to impute them with the most frequent values, so I use a self-defined value, "unknown" to fill out these values.</p>
+
+</div>
+</div>
+</div>
     
     
 <div class="cell border-box-sizing code_cell rendered">
@@ -1344,6 +1377,14 @@ Name: Publication Country, dtype: int64</pre>
 </div>
     
 
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Now, we have a dataset withour missing values.</p>
+
+</div>
+</div>
+</div>
     
     
 <div class="cell border-box-sizing code_cell rendered">
@@ -1411,7 +1452,15 @@ memory usage: 319.7+ KB
 <div class="cell border-box-sizing text_cell rendered">
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p><strong>Select target, split</strong></p>
+<p><strong>Select target and feeatures, split the dataset</strong></p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>First, I drop two variables that we do not use in modeling.</p>
 
 </div>
 </div>
@@ -1433,23 +1482,14 @@ memory usage: 319.7+ KB
 </div>
     
 
-    
-    
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-
+<div class="cell border-box-sizing text_cell rendered">
 <div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">proc</span> <span class="o">=</span> <span class="p">[</span><span class="n">Categorify</span><span class="p">,</span> <span class="n">Normalize</span><span class="p">]</span>
-</pre></div>
-
-    </div>
-</div>
-</div>
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Next, I normalize the numerical variables,  use entity embedding for categorical variables and randomly preseerve 20 percent of data as test set.</p>
 
 </div>
-    
-
+</div>
+</div>
     
     
 <div class="cell border-box-sizing code_cell rendered">
@@ -1458,75 +1498,22 @@ memory usage: 319.7+ KB
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">dep_var</span> <span class="o">=</span> <span class="s2">"Price"</span>
-</pre></div>
 
-    </div>
-</div>
-</div>
+<span class="c1"># preprocessing</span>
+<span class="n">proc</span> <span class="o">=</span> <span class="p">[</span><span class="n">Categorify</span><span class="p">,</span> <span class="n">Normalize</span><span class="p">]</span>
 
-</div>
-    
+<span class="c1"># find out which variable is continuous and which is categorical</span>
+<span class="n">cont</span><span class="p">,</span> <span class="n">cat</span> <span class="o">=</span> <span class="n">cont_cat_split</span><span class="p">(</span><span class="n">books</span><span class="p">,</span> <span class="n">max_card</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span><span class="n">dep_var</span><span class="o">=</span><span class="n">dep_var</span><span class="p">)</span>
 
-    
-    
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">cont</span><span class="p">,</span> <span class="n">cat</span> <span class="o">=</span> <span class="n">cont_cat_split</span><span class="p">(</span><span class="n">books</span><span class="p">,</span> <span class="n">max_card</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span><span class="n">dep_var</span><span class="o">=</span><span class="n">dep_var</span><span class="p">)</span>
-</pre></div>
-
-    </div>
-</div>
-</div>
-
-</div>
-    
-
-    
-    
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">train_size</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">books</span><span class="p">)</span><span class="o">*</span><span class="mf">0.8</span><span class="p">)</span>
+<span class="c1"># split the dataset</span>
+<span class="n">train_size</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">books</span><span class="p">)</span><span class="o">*</span><span class="mf">0.8</span><span class="p">)</span>
 <span class="n">splits</span> <span class="o">=</span> <span class="n">RandomSplitter</span><span class="p">()(</span><span class="n">books</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
-</pre></div>
 
-    </div>
-</div>
-</div>
+<span class="c1"># wrap the preprocessing and the split into fastai's TabularPandas</span>
+<span class="n">to</span> <span class="o">=</span> <span class="n">TabularPandas</span><span class="p">(</span><span class="n">books</span><span class="p">,</span> <span class="n">proc</span><span class="p">,</span> <span class="n">cat</span><span class="p">,</span> <span class="n">cont</span><span class="p">,</span> <span class="n">y_names</span><span class="o">=</span><span class="n">dep_var</span><span class="p">,</span> <span class="n">splits</span><span class="o">=</span><span class="n">splits</span><span class="p">)</span>
 
-</div>
-    
-
-    
-    
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">to</span> <span class="o">=</span> <span class="n">TabularPandas</span><span class="p">(</span><span class="n">books</span><span class="p">,</span> <span class="n">proc</span><span class="p">,</span> <span class="n">cat</span><span class="p">,</span> <span class="n">cont</span><span class="p">,</span> <span class="n">y_names</span><span class="o">=</span><span class="n">dep_var</span><span class="p">,</span> <span class="n">splits</span><span class="o">=</span><span class="n">splits</span><span class="p">)</span>
-</pre></div>
-
-    </div>
-</div>
-</div>
-
-</div>
-    
-
-    
-    
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">xs</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">to</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">xs</span><span class="p">,</span> <span class="n">to</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">y</span>
+<span class="c1"># get target and features for training and testing</span>
+<span class="n">xs</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">to</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">xs</span><span class="p">,</span> <span class="n">to</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">y</span>
 <span class="n">valid_xs</span><span class="p">,</span> <span class="n">valid_y</span> <span class="o">=</span> <span class="n">to</span><span class="o">.</span><span class="n">valid</span><span class="o">.</span><span class="n">xs</span><span class="p">,</span> <span class="n">to</span><span class="o">.</span><span class="n">valid</span><span class="o">.</span><span class="n">y</span>
 </pre></div>
 
@@ -1540,17 +1527,17 @@ memory usage: 319.7+ KB
 <div class="cell border-box-sizing text_cell rendered">
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<hr>
-
+<h2 id="Modeling">
+<a class="anchor" href="#Modeling" aria-hidden="true"><span class="octicon octicon-link"></span></a>Modeling<a class="anchor-link" href="#Modeling"> </a>
+</h2>
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing text_cell rendered">
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Modeling">
-<a class="anchor" href="#Modeling" aria-hidden="true"><span class="octicon octicon-link"></span></a>Modeling<a class="anchor-link" href="#Modeling"> </a>
-</h2>
+<p>In the modeling stage, I first define the metric, rmse, and write helper functions for computing cv scores and getting test score.</p>
+
 </div>
 </div>
 </div>
@@ -1593,6 +1580,14 @@ memory usage: 319.7+ KB
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p><strong>Baseline - predicting with mean price</strong></p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>To understand how good your machine learning models are, I use the mean of price to predict book proces as a baseline method.</p>
 
 </div>
 </div>
@@ -1672,6 +1667,14 @@ memory usage: 319.7+ KB
 </div>
     
 
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>A linear regression model  has a 0.487 rmse of 5-fold cv score using training set. How does it perform on the test set?</p>
+
+</div>
+</div>
+</div>
     
     
 <div class="cell border-box-sizing code_cell rendered">
@@ -1705,6 +1708,14 @@ memory usage: 319.7+ KB
 </div>
     
 
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>It get a 0.487 rmse on the test test which is much better than 0.77 from the baseline method.</p>
+
+</div>
+</div>
+</div>
 <div class="cell border-box-sizing text_cell rendered">
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
