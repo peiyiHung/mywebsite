@@ -174,14 +174,15 @@ window.onload = wrap_img;
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>Training a deep neural network is hard. One of the reasons that makes it so challenging is vanishing/exploding gradient problem. This problem can be resolved by carefully initializing your weights. But, the questions that was bothering me is: <strong>How does these weight initialization techniques affect the learning process?</strong> And, <strong>What would happen if we use inappropriate weights initalization?</strong> Therefore, in this article, I run an experiment with different weight initialization approach for different activation functions and observe how the activations change while passing through a deep neural network.</p>
+<p>Training a deep neural network is hard. One of the reasons that makes it so challenging is vanishing/exploding gradient problem. This problem can be partly resolved by carefully initializing your weights. But, the questions that was bothering me is: <strong>How does these weight initialization techniques affect the learning process?</strong> And, <strong>What would happen if we use inappropriate weights initalization?</strong> Therefore, in this article, I run an experiment with different weight initialization approach for different activation functions and observe how the activations change while passing through a deep neural network.</p>
 
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>The experiment is simple. I will make a fully-connnected network with six hidden layers, pass random values into the network, and plot and observe the distributions of the activation. Here's the code for the eperiment:</p>
+<p>The experiment is simple. I will make a fully-connnected network with six hidden layers, pass random values into the network, and plot and observe the distributions of the activation. In the experiment, two commonly used activation functions are under consideration: tanh and ReLU. For each function, I initialize the weights which are normally distributed with zero mean and different variances. Weights initialized with small variances would cause the acticvations vanishing, while weights with large would cause activations exploding. So, to successfully train our neural network, we should use appropriate weight initialization. We should use Xavier initialization for tanh (<a href="http://proceedings.mlr.press/v9/glorot10a.html">Golorot and Bengio, 2010</a>) and He initialzation for ReLU (<a href="https://arxiv.org/abs/1502.01852?wm=1027?1">He et al., 2015</a>). By observing the distributions of activations, we can see how these two initialization method help us to trian neural networks.</p>
+<p>Here's the code for the experiment:</p>
 
 </div>
 </div>
@@ -243,8 +244,7 @@ window.onload = wrap_img;
 
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>In the experiment, two commonly used activation functions are under consideration: tanh and ReLU. For each function, I try three types of weight initializations: values that cause the activations vanish, values causing the activations explode, and the adequate initialization methods. To successfully train our neural network, we should use Xavier initialization for tanh (<a href="http://proceedings.mlr.press/v9/glorot10a.html">Golorot and Bengio, 2010</a>) and use He initialzation for ReLU (<a href="https://arxiv.org/abs/1502.01852?wm=1027?1">He et al., 2015</a>). I will illustrate how these two techniques prevent our network from vanishing gradient during the experiment.</p>
-<p>This article is inpsired by the lecture 10 of the course, <a href="https://www.youtube.com/playlist?list=PL5-TkQAfAZFbzxjBHtzdVCWE0Zbhomg7r">Deep Learning for Computer Vision</a>, taught by <a href="https://web.eecs.umich.edu/~justincj/">Justin Johnson</a>. It is a great course and I highly recommend it.</p>
+<p>This article is inpsired by the lecture 10 of the course, <a href="https://www.youtube.com/playlist?list=PL5-TkQAfAZFbzxjBHtzdVCWE0Zbhomg7r">Deep Learning for Computer Vision</a>, taught by <a href="https://web.eecs.umich.edu/~justincj/">Justin Johnson</a>.</p>
 
 </div>
 </div>
@@ -252,6 +252,13 @@ window.onload = wrap_img;
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h1 id="Tanh">Tanh<a class="anchor-link" href="#Tanh"> </a></h1>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Let's take a look at tanh.</p>
+
 </div>
 </div>
 </div>
@@ -323,7 +330,14 @@ $$\text{tanh}'(x) = 1 - \text{tanh}^2(x)$$
 
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>weights is too small, all zero, not learning</p>
+<p>Tanh function is a S-shaped function bounded within -1 and 1. It is central by zero and has flat area at the two end, which means the gradient would be approximate zero as suggested by the derivative plot.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>We first try a small variance.</p>
 
 </div>
 </div>
