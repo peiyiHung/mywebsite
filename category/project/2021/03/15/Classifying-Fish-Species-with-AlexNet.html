@@ -98,7 +98,7 @@ window.onload = wrap_img;
        • <span class="read-time" title="Estimated read time">
     
     
-      3 min read
+      4 min read
     
 </span></p>
 
@@ -772,7 +772,7 @@ window.onload = wrap_img;
 <div class="cell border-box-sizing text_cell rendered">
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>pretrained model</p>
+<p>In this section, I download a pretrained AlexNet model from pytorch and train it to tackle this task. I freeze all the convolution layers as feature extractor and add new fully connected network to train for this task.</p>
 
 </div>
 </div>
@@ -928,7 +928,7 @@ window.onload = wrap_img;
 <div class="cell border-box-sizing text_cell rendered">
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>evaluate on test set</p>
+<p>It takes only 5 epochs to achieve the same level of accuracy as the model in previous section. Let's see how it does on test set.</p>
 
 </div>
 </div>
@@ -1034,9 +1034,25 @@ window.onload = wrap_img;
 <div class="cell border-box-sizing text_cell rendered">
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
+<p>This model gets almost all the images correctly classified.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
 <h1 id="Summary">
 <a class="anchor" href="#Summary" aria-hidden="true"><span class="octicon octicon-link"></span></a>Summary<a class="anchor-link" href="#Summary"> </a>
 </h1>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>This is a relatively easy task. It only takes 10 epochs to get a 98.4% accuray from a model that is trained from scratch. An AlexNet without batch normalization is hard to train. It is essential to add batch normalization to train a deep nural network. By applying transfer learning technique, we can get a 99.5% accuracy after only 5 epochs of traning.</p>
+
 </div>
 </div>
 </div>
