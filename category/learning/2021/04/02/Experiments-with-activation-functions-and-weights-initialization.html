@@ -98,7 +98,7 @@ window.onload = wrap_img;
        • <span class="read-time" title="Estimated read time">
     
     
-      6 min read
+      7 min read
     
 </span></p>
 
@@ -135,14 +135,14 @@ window.onload = wrap_img;
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>Training a deep neural network is hard. One of the reasons that makes it so challenging is vanishing/exploding gradient problem. This problem can be partly resolved by carefully initializing your weights. But, the questions that was bothering me is: <strong>How does these weight initialization techniques affect the learning process?</strong> And, <strong>What would happen if we use inappropriate weights initalization?</strong> Therefore, in this article, I run an experiment with different weight initialization approach for different activation functions and observe how the activations change while passing through a deep neural network.</p>
+<p>Training a deep neural network is hard. One of the reasons that makes it so challenging is vanishing/exploding gradient problem. This problem can be partly resolved by carefully initializing your weights. But, the questions bothering me are: <strong>How does these weight initialization techniques affect the learning process?</strong> and <strong>What would happen if we use inappropriate weights initalization?</strong> Therefore, in this article, I run an experiment with different weight initialization approaches for different activation functions and observe how the activations change while passing through a deep neural network.</p>
 
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>The experiment is simple. I will make a fully-connnected network with six hidden layers, pass random values into the network, and plot and observe the distributions of the activation. In the experiment, two commonly used activation functions are under consideration: tanh and ReLU. For each function, I initialize the weights which are normally distributed with zero mean and different variances. Weights initialized with small variances would cause the acticvations vanishing, while weights with large would cause activations exploding. So, to successfully train our neural network, we should use appropriate weight initialization. The proper initialization methods are Xavier initialization for tanh (<a href="http://proceedings.mlr.press/v9/glorot10a.html">Golorot and Bengio, 2010</a>) and He initialzation for ReLU (<a href="https://arxiv.org/abs/1502.01852?wm=1027?1">He et al., 2015</a>). By observing the distributions of activations, we can see how these two initialization method help us to trian neural networks. Also, I will briefly show why these two methods works before experimenting with these two methods.</p>
+<p>The experiment is simple. I will make a fully-connnected network with six hidden layers, pass random values into the network, and plot and observe the distributions of activations. In the experiment, two commonly used activation functions are under consideration: tanh and ReLU. For each function, I initialize the weights which are normally distributed with zero mean and different variances. Weights initialized with small variances would cause the acticvations vanishing, while weights with large may cause activations exploding or activation function satuartes. So, to successfully train our neural network, we should use appropriate weight initialization. The proper initialization methods are Xavier initialization for tanh (<a href="http://proceedings.mlr.press/v9/glorot10a.html">Golorot and Bengio, 2010</a>) and He initialzation for ReLU (<a href="https://arxiv.org/abs/1502.01852?wm=1027?1">He et al., 2015</a>). By observing the distributions of activations, we can see how these two initialization method help us to trian neural networks. Also, I will briefly show why these two methods works before experimenting with these two methods.</p>
 <p>Here's the code for the experiment:</p>
 
 </div>
@@ -394,14 +394,14 @@ where $L$ is the loss function, $z_l$ is the activation of layer $l$, and $w_l$ 
 
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>Most of activations are around -1 or 1. Within these areas, the slope of tanh are flat and the gradients are close to zero. This is usually referred to "saturation". Since most gradients are zero, our network is not learning.</p>
+<p>Most of activations are around -1 or 1. Within these areas, the slope of tanh are flat and the gradients are close to zero. This is usually referred to as "saturation". Since most gradients are zero, our network is not learning.</p>
 
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>The right initialization methods for tanh is <strong>Xavier initialization</strong>.</p>
+<p>The right initialization method for tanh is <strong>Xavier initialization</strong>.</p>
 
 </div>
 </div>
@@ -409,6 +409,7 @@ where $L$ is the loss function, $z_l$ is the activation of layer $l$, and $w_l$ 
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p><strong>Core idea</strong>: variance of input = variance of output</p>
+<p>We have</p>
 <p>
 $$y=Wx,\quad y_i = \displaystyle\sum_{j=1}^{Din}x_jw_{ij}$$
 </p>
@@ -473,7 +474,24 @@ $$</p>
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>The next activation function we are going to discuss is rectified linear units (ReLU). Here's the formula of ReLU, implementation of ReLU in numpy, and plots of ReLU formula and derivatives.</p>
+<p>The next activation function we are going to discuss is rectified linear units (ReLU). Here's the formula of ReLU and its derivatives, implementation of ReLU in numpy, and plots of ReLU formula and derivatives.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Formula: 
+
+$$f(x) = \text{max}(0, x)$$
+</p>
+<p>Derivatives:
+$$f'(x) = 
+\begin{cases}
+    x, \; \text{if } x &gt; 0\\ 
+    0, \; \text{if } x \leq 0
+\end{cases}
+$$</p>
 
 </div>
 </div>
@@ -626,7 +644,7 @@ $$</p>
 
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>The activations become larger as the data pass throught the network. Because of the charateristic of ReLU, the gradients will also get larger. An extremely large gradient cause numerical overflow which is not good for optimization.</p>
+<p>The activations become larger as the data pass throught the network. Because of the charateristic of ReLU, the gradients will also get larger. An extremely large gradient causes numerical overflow which is not good for optimization.</p>
 
 </div>
 </div>
