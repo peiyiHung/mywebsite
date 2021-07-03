@@ -166,7 +166,7 @@ window.onload = wrap_img;
 <div class="cell border-box-sizing text_cell rendered">
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>In this project I bulid a model for identifying dog breed from a image. This task is originally  <a href="https://www.kaggle.com/c/dog-breed-identification">a Kaggle competition</a> held three years age. The competition provided 10222 dog images for training and 10357 for evaluating model performance. There are 120 various dog breed to classify in the dataset. I tackle this task by concatenating outputs of convolutional layers of two CNNs that were both pretrained on the ImageNet dataset. This model yields 92.5% accuracy in only 5 epochs. The complete work can be found on this <a href="https://www.kaggle.com/hongpeiyi/using-multiple-pretrained-cnns-with-fastai">Kaggle notebook</a>.</p>
+<p>In this project I bulid a model for identifying dog breed from a image. This task is originally  <a href="https://www.kaggle.com/c/dog-breed-identification">a Kaggle competition</a> held three years age. The competition provided 10222 dog images for training and 10357 for evaluating model performance. There are 120 various dog breed to classify in the dataset. I tackle this task by concatenating outputs of convolutional layers of two CNNs that were both pretrained on the ImageNet dataset. This model yields 92.5% accuracy with only 5 epochs. The complete work can be found on this <a href="https://www.kaggle.com/hongpeiyi/using-multiple-pretrained-cnns-with-fastai">Kaggle notebook</a>.</p>
 
 </div>
 </div>
@@ -402,7 +402,7 @@ window.onload = wrap_img;
 <div class="cell border-box-sizing text_cell rendered">
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>After the data is ready, we can start to build our model architecture.</p>
+<p>Once the data is ready, we can start to build our model architecture.</p>
 <p><strong>Step 1:</strong> Download two pretrained CNNs, chop off the classifiers and set them to evalutaion mode by <code>.eval()</code>.</p>
 
 </div>
@@ -450,7 +450,7 @@ window.onload = wrap_img;
 <div class="cell border-box-sizing text_cell rendered">
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>I download pretrained InceptionV3 and resnet50 from the internet. I would like to use these CNNs as feature extractors, so I get rid of the classifiers part and freeze them.</p>
+<p>I download pretrained InceptionV3 and resnet50 from the internet. In order to use these CNNs as feature extractors, I get rid of the classifiers part and freeze them.</p>
 <p><strong>Step 2:</strong> Concatenate the output of CNNs as features and Make a new classifier.</p>
 
 </div>
@@ -496,7 +496,7 @@ window.onload = wrap_img;
 <div class="cell border-box-sizing text_cell rendered">
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>The outputs would be used as features and fed into a untrained classifier. Here's what the model attributes indicate:</p>
+<p>The outputs of convolutional layers would be used as features. Based on these features, a entirely new classifier would be trained. Here's what the model attributes indicate:</p>
 <ul>
 <li>
 <code>extractors</code>: list of pretrained CNNs</li>
@@ -551,7 +551,7 @@ window.onload = wrap_img;
 <div class="cell border-box-sizing text_cell rendered">
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>I have tried a single and deeper CNN (resnet101) to address this problem, but it took a longer time to train and did not reach the same level of accuracy. After several experiments on using a single model, I start to find what others did on Kaggle's Discussions section. Many people used similar approaches to get good preformance, so I decide to use this architecture.</p>
+<p>I have tried a single and deeper CNN (resnet152) to address this problem, but it took a longer time to train and did not reach the same level of accuracy. After several experiments on using a single model, I start to find what others did on Kaggle's Discussions section. Many people used similar approaches as these to get good preformance, so I decide to use this architecture.</p>
 
 </div>
 </div>
@@ -571,9 +571,9 @@ window.onload = wrap_img;
 <p>Here's how I trained this model:</p>
 <ul>
 <li>use cross entropy as loss function and accuracy to evaluate the model performance</li>
-<li>Adam as optimization method</li>
+<li>use Adam as optimization method</li>
 <li>
-<code>fit_one_cycle</code>: learning rate starts at a small value and first increase and the decrease.</li>
+<code>fit_one_cycle</code>: learning rate starts at a small value and first increase and then decrease.</li>
 </ul>
 
 </div>
@@ -723,7 +723,7 @@ window.onload = wrap_img;
 <div class="cell border-box-sizing text_cell rendered">
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>This model can reach a fairly good accuracy with only 5 epochs (roughly 15 minutes), which is quite efficient. It outperforms a deeper single model by higher accuracy and less training time. This reason why it can do this might be the variety of features. That is, these pretrained CNNs learn different features from the image, so our classifier can learn better with these abundant features. What I've learned from this project is that a "wider" model may do better than a "deeper" model in some cases, so getting your model deeper and deeper is not the only choice to make you model more poweerful.</p>
+<p>This model can reach a fairly good accuracy with only 5 epochs (roughly 15 minutes), which is quite efficient. It outperforms a single and deeper model by higher accuracy and less training time. The reason why it can do this might be the variety of features. That is, these pretrained CNNs learn different features from the image, so our classifier can learn better with these abundant features. What I've learned from this project is that a "wider" model may do better than a "deeper" model in some cases, so getting your model deeper and deeper is not the only choice to make you model more powerful.</p>
 
 </div>
 </div>
