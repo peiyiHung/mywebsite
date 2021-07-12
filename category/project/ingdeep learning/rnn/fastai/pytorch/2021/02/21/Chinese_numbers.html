@@ -98,7 +98,7 @@ window.onload = wrap_img;
        • <span class="read-time" title="Estimated read time">
     
     
-      8 min read
+      9 min read
     
 </span></p>
 
@@ -188,7 +188,7 @@ window.onload = wrap_img;
 <div class="cell border-box-sizing text_cell rendered">
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>In order to better understand what are a language model and recurrent neural networks (RNN), I create a simple dataset on Chinese numbers and train various RNNs to build a language model of Chinese numbers in this project. The dataset contains Traditional Chinese characters of numbers from 0 to 9999 and I train models to predict the next Chinese number in the dataset.  Most models are built by common modules in Pytorch instead of off-the-shelf Pytorch RNN moduels. For example, I make LSTM cells using only <code>nn.Linear</code> rather than <code>nn.LSTM</code>. Only the last model are created using Pytorch's <code>nn.LSTM</code> and, by adding regularization techniques, it yields an accuracy of 96%.</p>
+<p>In order to better understand what are a language model and recurrent neural networks (RNN), I create a simple dataset on Chinese numbers and train various RNNs to build a language model of Chinese numbers in this project. The dataset contains Traditional Chinese characters of numbers from 0 to 9999 and I train models to predict the next Chinese number in the dataset.  Most models are built by common modules in Pytorch instead of off-the-shelf Pytorch RNN moduels. For example, I make LSTM cells using only <code>nn.Linear</code> rather than <code>nn.LSTM</code>. Only the last model are created using Pytorch's <code>nn.LSTM</code> and, by adding regularization techniques, it yields an accuracy of 96%. This project is inspired by the chapter 12 of <a href="https://github.com/fastai/fastbook">the fastai book</a> in which the author creates a dataset of English numbers and trains language models.</p>
 
 </div>
 </div>
@@ -391,6 +391,22 @@ window.onload = wrap_img;
 </div>
 </div>
 </div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Before we delve into modeling, we should first make our dataset understandable by the model. That is, we should tokenize the data and numericalize the tokens.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Tokenization is to transfer each Chinese character into a token.</p>
+
+</div>
+</div>
+</div>
     
     
 <div class="cell border-box-sizing code_cell rendered">
@@ -425,6 +441,14 @@ window.onload = wrap_img;
 </div>
     
 
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><code>vocab</code> is the collection of unique tokens.</p>
+
+</div>
+</div>
+</div>
     
     
 <div class="cell border-box-sizing code_cell rendered">
@@ -442,6 +466,14 @@ window.onload = wrap_img;
 </div>
     
 
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Numericalization is to map a token to a non-negative number so as to be taken by the <code>nn.Embedding</code> layer of RNNs.</p>
+
+</div>
+</div>
+</div>
     
     
 <div class="cell border-box-sizing code_cell rendered">
@@ -486,6 +518,14 @@ window.onload = wrap_img;
 </div>
 </div>
 </div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Next, we rearrange the data into batches and form the dataloaders</p>
+
+</div>
+</div>
+</div>
     
     
 <div class="cell border-box-sizing code_cell rendered">
@@ -514,8 +554,8 @@ window.onload = wrap_img;
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">sl</span> <span class="o">=</span> <span class="mi">16</span>
-<span class="n">bs</span> <span class="o">=</span> <span class="mi">32</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">sl</span> <span class="o">=</span> <span class="mi">16</span> <span class="c1"># sequence length</span>
+<span class="n">bs</span> <span class="o">=</span> <span class="mi">32</span> <span class="c1"># batch size</span>
 <span class="n">seqs</span> <span class="o">=</span> <span class="n">L</span><span class="p">((</span><span class="n">tensor</span><span class="p">(</span><span class="n">nums</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span><span class="o">+</span><span class="n">sl</span><span class="p">]),</span> <span class="n">tensor</span><span class="p">(</span><span class="n">nums</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">:</span><span class="n">i</span><span class="o">+</span><span class="n">sl</span><span class="o">+</span><span class="mi">1</span><span class="p">]))</span>
          <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">nums</span><span class="p">)</span><span class="o">-</span><span class="n">sl</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="n">sl</span><span class="p">))</span>
 <span class="n">cut</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">seqs</span><span class="p">)</span> <span class="o">*</span> <span class="mf">0.8</span><span class="p">)</span>
@@ -531,6 +571,14 @@ window.onload = wrap_img;
 </div>
     
 
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Let's see how the data is formed in a batch:</p>
+
+</div>
+</div>
+</div>
     
     
 <div class="cell border-box-sizing code_cell rendered">
@@ -548,6 +596,80 @@ window.onload = wrap_img;
 </div>
     
 
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">L</span><span class="p">(</span><span class="n">vocab</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">xs</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>(#16) ['零','.','一','.','二','.','三','.','四','.'...]</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">L</span><span class="p">(</span><span class="n">vocab</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">y</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>(#16) ['.','一','.','二','.','三','.','四','.','五'...]</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>For each time step, the model is predicting the next word given previous word, so the independent variable is a sequence of tokens and the target would be the next word.</p>
+
+</div>
+</div>
+</div>
 <div class="cell border-box-sizing text_cell rendered">
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
@@ -560,15 +682,16 @@ window.onload = wrap_img;
 <div class="cell border-box-sizing text_cell rendered">
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>model list:</p>
+<p>In this section, I create RNN models for the language model task. Here's a list of models:</p>
 <ul>
 <li>vanilla RNN</li>
 <li>two-layered RNN</li>
 <li>LSTM</li>
 <li>two-layered LSTM</li>
 <li>GRU</li>
-<li>LSTM + regularization (using Pytorch's <code>nn.LSTM</code> module)</li>
+<li>LSTM + regularization </li>
 </ul>
+<p>The last one uses Pytorch's <code>nn.LSTM</code>, while the rest only use <code>nn.Linear</code> and <code>nn.Embedding</code> modules.</p>
 
 </div>
 </div>
