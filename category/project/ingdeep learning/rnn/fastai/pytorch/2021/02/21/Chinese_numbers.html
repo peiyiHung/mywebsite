@@ -98,7 +98,7 @@ window.onload = wrap_img;
        • <span class="read-time" title="Estimated read time">
     
     
-      9 min read
+      11 min read
     
 </span></p>
 
@@ -691,7 +691,7 @@ window.onload = wrap_img;
 <li>GRU</li>
 <li>LSTM + regularization </li>
 </ul>
-<p>The last one uses Pytorch's <code>nn.LSTM</code>, while the rest only use <code>nn.Linear</code> and <code>nn.Embedding</code> modules.</p>
+<p>The last one uses Pytorch's <code>nn.LSTM</code>, while the rest only use <code>nn.Linear</code> and <code>nn.Embedding</code> modules. All the models would be trained using cross entropy as loss function, Adam as optimization method and accuracy as evaluation metric.</p>
 
 </div>
 </div>
@@ -702,6 +702,14 @@ window.onload = wrap_img;
 <h2 id="Vanilla-RNN">
 <a class="anchor" href="#Vanilla-RNN" aria-hidden="true"><span class="octicon octicon-link"></span></a>Vanilla RNN<a class="anchor-link" href="#Vanilla-RNN"> </a>
 </h2>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>The first model is a RNN with only plain linear layers in it.</p>
+
 </div>
 </div>
 </div>
@@ -721,6 +729,8 @@ window.onload = wrap_img;
         
     <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
         <span class="n">outs</span> <span class="o">=</span> <span class="p">[]</span>
+        
+        <span class="c1"># walking through each time step</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">sl</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">h</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">i_h</span><span class="p">(</span><span class="n">x</span><span class="p">[:,</span><span class="n">i</span><span class="p">])</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">h</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">relu</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">h_h</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">))</span>
@@ -741,6 +751,33 @@ window.onload = wrap_img;
 </div>
     
 
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>This model is composed of:</p>
+<ul>
+<li>
+<code>self.i_h</code>: an embedding layer (<code>nn.Embedding</code>) taking into a index of a token and return the embedding vector of a token.</li>
+<li>
+<code>self.h_h</code>: a plain linear layer taking the vector of word and performing linear transformation</li>
+<li>
+<code>self.h_o</code>: the output layer generating the probability of being each word in the <code>vocab</code>
+</li>
+<li>
+<code>self.h</code>: the hidden state of the RNN</li>
+</ul>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Let's train this model:</p>
+
+</div>
+</div>
+</div>
     
     
 <div class="cell border-box-sizing code_cell rendered">
@@ -912,9 +949,25 @@ window.onload = wrap_img;
 <div class="cell border-box-sizing text_cell rendered">
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
+<p>We get 75% accuracy after 10 epochs.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
 <h2 id="Two-layered-RNN">
 <a class="anchor" href="#Two-layered-RNN" aria-hidden="true"><span class="octicon octicon-link"></span></a>Two-layered RNN<a class="anchor-link" href="#Two-layered-RNN"> </a>
 </h2>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>You can stack multiple linear layers in a RNN to make you model more powerful. Here I make a two-layered one.</p>
+
 </div>
 </div>
 </div>
@@ -958,6 +1011,14 @@ window.onload = wrap_img;
 </div>
     
 
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>This model is also a RNN with plain linear layers but it has two linear layers. You can find the two linear layers in the codes:<code>self.h_h1</code> and <code>self.h_h2</code>. Let's see if it can outperform the single-layered one.</p>
+
+</div>
+</div>
+</div>
     
     
 <div class="cell border-box-sizing code_cell rendered">
@@ -1130,9 +1191,33 @@ window.onload = wrap_img;
 <div class="cell border-box-sizing text_cell rendered">
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
+<p>This model get 2% increase in accuracy also with 10 epcohs as the previous one.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>The vanilla RNN severely suffers from the vanishing gradient problem. To resolve the problem, several cell architectures are designed including <a href="https://www.bioinf.jku.at/publications/older/2604.pdf">Long Short-term Memory (LSTM)</a> and <a href="https://arxiv.org/abs/1406.1078v3">Gated Recurrent Unit (GRU)</a>. I would implement these two method with Pytorch in the following sections.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
 <h2 id="LSTM">
 <a class="anchor" href="#LSTM" aria-hidden="true"><span class="octicon octicon-link"></span></a>LSTM<a class="anchor-link" href="#LSTM"> </a>
 </h2>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Instead of using a linear layer, LSTM use a specially designed cells in a RNN. Here's the cell in codes:</p>
+
 </div>
 </div>
 </div>
@@ -1167,7 +1252,8 @@ window.onload = wrap_img;
         <span class="n">h</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tanh</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="o">*</span> <span class="n">output</span>
         <span class="k">return</span> <span class="n">h</span><span class="p">,</span> <span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span>
         
-        
+
+<span class="c1"># build a RNN applying LSTM cell</span>
 <span class="k">class</span> <span class="nc">MyLSTM</span><span class="p">(</span><span class="n">Module</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vocab_sz</span><span class="p">,</span> <span class="n">n_hidden</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">i_h</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Embedding</span><span class="p">(</span><span class="n">vocab_sz</span><span class="p">,</span> <span class="n">n_hidden</span><span class="p">)</span>
@@ -1198,6 +1284,28 @@ window.onload = wrap_img;
 </div>
     
 
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>In a LSTM architecture, two states would be passed through the network: hidden state <code>h</code> and cell state <code>c</code>. Hidden state <code>h</code> would be passed into three gates: forget gate, input gate, and output gate.</p>
+
+<pre><code>forget = torch.sigmoid(self.forget_gate(h))
+inp = torch.sigmoid(self.input_gate(h))
+output = torch.sigmoid(self.outout_gate(h))</code></pre>
+<p>Since these three gates all use sigmoid function as activation function, they would produce three scores ranging from 0 to 1. A new cell state would be computed by passing hidden state <code>h</code> into <code>self.cell_gate</code> and <code>torch.tanh</code>.</p>
+
+<pre><code>cell = torch.tanh(self.cell_gate(h))</code></pre>
+<p>The update version of cell state would be a weighted average of the previous cell state and the one that's newly computed. The weights are the output of forget gate and input gate.</p>
+
+<pre><code>c = forget * c + inp*cell</code></pre>
+<p>This new cell state would also be passed into a <code>torch.tanh</code> and times the output of output gate becoming the new hidden state <code>h</code>.</p>
+
+<pre><code>h = torch.tanh(c) * output</code></pre>
+<p>There are two sets of output of the LSTM cell: <code>h</code> is the output of each time step and <code>(h, c)</code> are the states passed into the next time step.</p>
+
+</div>
+</div>
+</div>
     
     
 <div class="cell border-box-sizing code_cell rendered">
