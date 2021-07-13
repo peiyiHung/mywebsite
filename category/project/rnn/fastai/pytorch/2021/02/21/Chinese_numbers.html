@@ -11,14 +11,14 @@
 <meta property="og:locale" content="en_US" />
 <meta name="description" content="Make a dataset of Chinese numbers and train language models for it with LSTM and GRU which are built from scratch." />
 <meta property="og:description" content="Make a dataset of Chinese numbers and train language models for it with LSTM and GRU which are built from scratch." />
-<link rel="canonical" href="https://peiyihung.github.io/mywebsite/category/project/ingdeep%20learning/rnn/fastai/pytorch/2021/02/21/Chinese_numbers.html" />
-<meta property="og:url" content="https://peiyihung.github.io/mywebsite/category/project/ingdeep%20learning/rnn/fastai/pytorch/2021/02/21/Chinese_numbers.html" />
+<link rel="canonical" href="https://peiyihung.github.io/mywebsite/category/project/rnn/fastai/pytorch/2021/02/21/Chinese_numbers.html" />
+<meta property="og:url" content="https://peiyihung.github.io/mywebsite/category/project/rnn/fastai/pytorch/2021/02/21/Chinese_numbers.html" />
 <meta property="og:site_name" content="PeiyiHung" />
 <meta property="og:image" content="https://peiyihung.github.io/mywebsite/images/vanillaRNN.png" />
 <meta property="og:type" content="article" />
 <meta property="article:published_time" content="2021-02-21T00:00:00-06:00" />
 <script type="application/ld+json">
-{"description":"Make a dataset of Chinese numbers and train language models for it with LSTM and GRU which are built from scratch.","url":"https://peiyihung.github.io/mywebsite/category/project/ingdeep%20learning/rnn/fastai/pytorch/2021/02/21/Chinese_numbers.html","@type":"BlogPosting","headline":"Building a Language Model for Chinese Numbers using LSTM and GRU","dateModified":"2021-02-21T00:00:00-06:00","datePublished":"2021-02-21T00:00:00-06:00","author":{"@type":"Person","name":"Peiyi Hung"},"image":"https://peiyihung.github.io/mywebsite/images/vanillaRNN.png","mainEntityOfPage":{"@type":"WebPage","@id":"https://peiyihung.github.io/mywebsite/category/project/ingdeep%20learning/rnn/fastai/pytorch/2021/02/21/Chinese_numbers.html"},"@context":"https://schema.org"}</script>
+{"description":"Make a dataset of Chinese numbers and train language models for it with LSTM and GRU which are built from scratch.","url":"https://peiyihung.github.io/mywebsite/category/project/rnn/fastai/pytorch/2021/02/21/Chinese_numbers.html","@type":"BlogPosting","headline":"Building a Language Model for Chinese Numbers using LSTM and GRU","dateModified":"2021-02-21T00:00:00-06:00","datePublished":"2021-02-21T00:00:00-06:00","author":{"@type":"Person","name":"Peiyi Hung"},"image":"https://peiyihung.github.io/mywebsite/images/vanillaRNN.png","mainEntityOfPage":{"@type":"WebPage","@id":"https://peiyihung.github.io/mywebsite/category/project/rnn/fastai/pytorch/2021/02/21/Chinese_numbers.html"},"@context":"https://schema.org"}</script>
 <!-- End Jekyll SEO tag -->
 <link rel="stylesheet" href="/mywebsite/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="https://peiyihung.github.io/mywebsite/feed.xml" title="PeiyiHung" /><link rel="shortcut icon" type="image/x-icon" href="/mywebsite/images/py.ico">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Primer/15.2.0/primer.css" integrity="sha512-xTz2ys4coGAOz8vuV1NcQBkgVmKhsSEtjbqyMJbBHRplFuvKIUo6xhLHpAyPt9mfR6twHJgn9OgVLuqOvjeBhg==" crossorigin="anonymous" />
@@ -98,7 +98,7 @@ window.onload = wrap_img;
        • <span class="read-time" title="Estimated read time">
     
     
-      11 min read
+      12 min read
     
 </span></p>
 
@@ -109,9 +109,6 @@ window.onload = wrap_img;
         &nbsp;
       
         <a class="category-tags-link" href="/mywebsite/categories/#project">project</a>
-        &nbsp;
-      
-        <a class="category-tags-link" href="/mywebsite/categories/#ingdeep learning">ingdeep learning</a>
         &nbsp;
       
         <a class="category-tags-link" href="/mywebsite/categories/#RNN">RNN</a>
@@ -160,9 +157,9 @@ window.onload = wrap_img;
 <ul>
 <li class="toc-entry toc-h2"><a href="#Vanilla-RNN">Vanilla RNN </a></li>
 <li class="toc-entry toc-h2"><a href="#Two-layered-RNN">Two-layered RNN </a></li>
-<li class="toc-entry toc-h2"><a href="#LSTM">LSTM </a></li>
+<li class="toc-entry toc-h2"><a href="#Long-Short-Term-Memory-(LSTM)">Long Short-Term Memory (LSTM) </a></li>
 <li class="toc-entry toc-h2"><a href="#Two-layered-LSTM">Two-layered LSTM </a></li>
-<li class="toc-entry toc-h2"><a href="#GRU">GRU </a></li>
+<li class="toc-entry toc-h2"><a href="#Gated-Recurrent-Unit-(GRU)">Gated Recurrent Unit (GRU) </a></li>
 <li class="toc-entry toc-h2"><a href="#LSTM-+-Regularization-techniques">LSTM + Regularization techniques </a></li>
 </ul>
 </li>
@@ -1207,8 +1204,8 @@ window.onload = wrap_img;
 <div class="cell border-box-sizing text_cell rendered">
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="LSTM">
-<a class="anchor" href="#LSTM" aria-hidden="true"><span class="octicon octicon-link"></span></a>LSTM<a class="anchor-link" href="#LSTM"> </a>
+<h2 id="Long-Short-Term-Memory-(LSTM)">
+<a class="anchor" href="#Long-Short-Term-Memory-(LSTM)" aria-hidden="true"><span class="octicon octicon-link"></span></a>Long Short-Term Memory (LSTM)<a class="anchor-link" href="#Long-Short-Term-Memory-(LSTM)"> </a>
 </h2>
 </div>
 </div>
@@ -1302,6 +1299,14 @@ output = torch.sigmoid(self.outout_gate(h))</code></pre>
 
 <pre><code>h = torch.tanh(c) * output</code></pre>
 <p>There are two sets of output of the LSTM cell: <code>h</code> is the output of each time step and <code>(h, c)</code> are the states passed into the next time step.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Let's train this LSTM model:</p>
 
 </div>
 </div>
@@ -1478,9 +1483,25 @@ output = torch.sigmoid(self.outout_gate(h))</code></pre>
 <div class="cell border-box-sizing text_cell rendered">
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
+<p>We train it for 10 epochs and this model use only get 70% accuracy.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
 <h2 id="Two-layered-LSTM">
 <a class="anchor" href="#Two-layered-LSTM" aria-hidden="true"><span class="octicon octicon-link"></span></a>Two-layered LSTM<a class="anchor-link" href="#Two-layered-LSTM"> </a>
 </h2>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>As in the vanilla RNN, we can also stack LSTM cells, so I create a two-layered one here.</p>
+
 </div>
 </div>
 </div>
@@ -1533,6 +1554,14 @@ output = torch.sigmoid(self.outout_gate(h))</code></pre>
 </div>
     
 
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Since we have two LSTM cells in the RNN, two sets of states are computed (<code>state1</code> and <code>state2</code>). The output hidden state of the first LSTM cell would be passed into the next LSTM cell and the next LSTM cell would generate the probability of each word.</p>
+
+</div>
+</div>
+</div>
     
     
 <div class="cell border-box-sizing code_cell rendered">
@@ -1705,8 +1734,8 @@ output = torch.sigmoid(self.outout_gate(h))</code></pre>
 <div class="cell border-box-sizing text_cell rendered">
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="GRU">
-<a class="anchor" href="#GRU" aria-hidden="true"><span class="octicon octicon-link"></span></a>GRU<a class="anchor-link" href="#GRU"> </a>
+<h2 id="Gated-Recurrent-Unit-(GRU)">
+<a class="anchor" href="#Gated-Recurrent-Unit-(GRU)" aria-hidden="true"><span class="octicon octicon-link"></span></a>Gated Recurrent Unit (GRU)<a class="anchor-link" href="#Gated-Recurrent-Unit-(GRU)"> </a>
 </h2>
 </div>
 </div>
@@ -2138,7 +2167,7 @@ output = torch.sigmoid(self.outout_gate(h))</code></pre>
         theme="github-light"
         crossorigin="anonymous"
         async>
-</script><a class="u-url" href="/mywebsite/category/project/ingdeep%20learning/rnn/fastai/pytorch/2021/02/21/Chinese_numbers.html" hidden></a>
+</script><a class="u-url" href="/mywebsite/category/project/rnn/fastai/pytorch/2021/02/21/Chinese_numbers.html" hidden></a>
 </article>
       </div>
     </main><footer class="site-footer h-card">
