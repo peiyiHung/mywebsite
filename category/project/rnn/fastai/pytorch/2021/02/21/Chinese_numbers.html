@@ -98,7 +98,7 @@ window.onload = wrap_img;
        • <span class="read-time" title="Estimated read time">
     
     
-      12 min read
+      13 min read
     
 </span></p>
 
@@ -1213,7 +1213,7 @@ window.onload = wrap_img;
 <div class="cell border-box-sizing text_cell rendered">
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>Instead of using a linear layer, LSTM use a specially designed cells in a RNN. Here's the cell in codes:</p>
+<p>Instead of using a linear layer, LSTM use a much more sophisticated cells in a RNN. Here's the cell in codes:</p>
 
 </div>
 </div>
@@ -1249,9 +1249,56 @@ window.onload = wrap_img;
         <span class="n">h</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tanh</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="o">*</span> <span class="n">output</span>
         <span class="k">return</span> <span class="n">h</span><span class="p">,</span> <span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span>
         
+</pre></div>
 
-<span class="c1"># build a RNN applying LSTM cell</span>
-<span class="k">class</span> <span class="nc">MyLSTM</span><span class="p">(</span><span class="n">Module</span><span class="p">):</span>
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>In a LSTM cell, two states would be passed through the network: hidden state <code>h</code> and cell state <code>c</code>. Hidden state and the input (<code>input_</code>) at each time step would be concatenated together first.</p>
+
+<pre><code>h = torch.stack([h, input_], dim=1).view(-1, self.n_size)</code></pre>
+<p>And then they would be passed into three gates: forget gate, input gate, and output gate.</p>
+
+<pre><code>forget = torch.sigmoid(self.forget_gate(h))
+inp = torch.sigmoid(self.input_gate(h))
+output = torch.sigmoid(self.outout_gate(h))</code></pre>
+<p>Since these three gates all use sigmoid function as activation function, they would produce three scores ranging from 0 to 1. A new cell state would be computed by passing hidden state into the cell state and then the tanh function.</p>
+
+<pre><code>cell = torch.tanh(self.cell_gate(h))</code></pre>
+<p>The updated cell state would be a weighted average of the previous cell state and the one that's newly computed. The weights are the output of forget gate and input gate.</p>
+
+<pre><code>c = forget * c + inp * cell</code></pre>
+<p>This new cell state would also be passed into the tanh function and times the output gate score becoming the new hidden state.</p>
+
+<pre><code>h = torch.tanh(c) * output</code></pre>
+<p>There are two sets of output of the LSTM cell: <code>h</code> is the output of each time step and <code>(h, c)</code> are the states passed into the next time step.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Let's bulid a LSTM RNN and train it:</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">class</span> <span class="nc">MyLSTM</span><span class="p">(</span><span class="n">Module</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vocab_sz</span><span class="p">,</span> <span class="n">n_hidden</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">i_h</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Embedding</span><span class="p">(</span><span class="n">vocab_sz</span><span class="p">,</span> <span class="n">n_hidden</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">rnn</span> <span class="o">=</span> <span class="n">LSTMCell</span><span class="p">(</span><span class="n">n_hidden</span><span class="p">,</span> <span class="n">n_hidden</span><span class="p">)</span>
@@ -1281,36 +1328,6 @@ window.onload = wrap_img;
 </div>
     
 
-<div class="cell border-box-sizing text_cell rendered">
-<div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<p>In a LSTM architecture, two states would be passed through the network: hidden state <code>h</code> and cell state <code>c</code>. Hidden state <code>h</code> would be passed into three gates: forget gate, input gate, and output gate.</p>
-
-<pre><code>forget = torch.sigmoid(self.forget_gate(h))
-inp = torch.sigmoid(self.input_gate(h))
-output = torch.sigmoid(self.outout_gate(h))</code></pre>
-<p>Since these three gates all use sigmoid function as activation function, they would produce three scores ranging from 0 to 1. A new cell state would be computed by passing hidden state <code>h</code> into <code>self.cell_gate</code> and <code>torch.tanh</code>.</p>
-
-<pre><code>cell = torch.tanh(self.cell_gate(h))</code></pre>
-<p>The update version of cell state would be a weighted average of the previous cell state and the one that's newly computed. The weights are the output of forget gate and input gate.</p>
-
-<pre><code>c = forget * c + inp*cell</code></pre>
-<p>This new cell state would also be passed into a <code>torch.tanh</code> and times the output of output gate becoming the new hidden state <code>h</code>.</p>
-
-<pre><code>h = torch.tanh(c) * output</code></pre>
-<p>There are two sets of output of the LSTM cell: <code>h</code> is the output of each time step and <code>(h, c)</code> are the states passed into the next time step.</p>
-
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<p>Let's train this LSTM model:</p>
-
-</div>
-</div>
-</div>
     
     
 <div class="cell border-box-sizing code_cell rendered">
@@ -1483,7 +1500,7 @@ output = torch.sigmoid(self.outout_gate(h))</code></pre>
 <div class="cell border-box-sizing text_cell rendered">
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>We train it for 10 epochs and this model use only get 70% accuracy.</p>
+<p>We train it for 10 epochs and this model use only get 70% accuracy. There may be some other problems we have to deal with.</p>
 
 </div>
 </div>
@@ -1500,7 +1517,7 @@ output = torch.sigmoid(self.outout_gate(h))</code></pre>
 <div class="cell border-box-sizing text_cell rendered">
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>As in the vanilla RNN, we can also stack LSTM cells, so I create a two-layered one here.</p>
+<p>As in the vanilla RNN, we can also stack LSTM cells. I create a two-layered one here.</p>
 
 </div>
 </div>
@@ -1740,6 +1757,14 @@ output = torch.sigmoid(self.outout_gate(h))</code></pre>
 </div>
 </div>
 </div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>GRU also attempts to address vanishing gradient problem as LSTM but it is less complicated than LSTM.</p>
+
+</div>
+</div>
+</div>
     
     
 <div class="cell border-box-sizing code_cell rendered">
@@ -1749,9 +1774,9 @@ output = torch.sigmoid(self.outout_gate(h))</code></pre>
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="k">class</span> <span class="nc">GRUcell</span><span class="p">(</span><span class="n">Module</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ni</span><span class="p">,</span> <span class="n">nh</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">z_gate</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">ni</span><span class="o">+</span><span class="n">nh</span><span class="p">,</span> <span class="n">nh</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">u_gate</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">ni</span><span class="o">+</span><span class="n">nh</span><span class="p">,</span> <span class="n">nh</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">r_gate</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">ni</span><span class="o">+</span><span class="n">nh</span><span class="p">,</span> <span class="n">nh</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">g_gate</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">ni</span><span class="o">+</span><span class="n">nh</span><span class="p">,</span> <span class="n">nh</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">g</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">ni</span><span class="o">+</span><span class="n">nh</span><span class="p">,</span> <span class="n">nh</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">n_size</span> <span class="o">=</span> <span class="n">ni</span><span class="o">+</span><span class="n">nh</span>
         
     <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">h</span><span class="p">):</span>
@@ -1759,16 +1784,61 @@ output = torch.sigmoid(self.outout_gate(h))</code></pre>
         <span class="n">h_t</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">h</span><span class="p">,</span> <span class="n">x</span><span class="p">],</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_size</span><span class="p">)</span>
         
         <span class="c1"># update gate and reset gate</span>
-        <span class="n">z</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sigmoid</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">z_gate</span><span class="p">(</span><span class="n">h_t</span><span class="p">))</span>
+        <span class="n">u</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sigmoid</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">u_gate</span><span class="p">(</span><span class="n">h_t</span><span class="p">))</span>
         <span class="n">r</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sigmoid</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">r_gate</span><span class="p">(</span><span class="n">h_t</span><span class="p">))</span>
         
         <span class="c1"># update or rest content</span>
         <span class="n">rh</span> <span class="o">=</span> <span class="n">h</span> <span class="o">*</span> <span class="n">r</span>
         <span class="n">x_rh</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">x</span><span class="p">,</span> <span class="n">rh</span><span class="p">],</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_size</span><span class="p">)</span>
-        <span class="n">g</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tanh</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">g_gate</span><span class="p">(</span><span class="n">x_rh</span><span class="p">))</span>
-        <span class="k">return</span> <span class="n">z</span><span class="o">*</span><span class="n">h</span> <span class="o">+</span> <span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">z</span><span class="p">)</span><span class="o">*</span><span class="n">g</span>
+        <span class="n">g</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tanh</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">g</span><span class="p">(</span><span class="n">x_rh</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">u</span><span class="o">*</span><span class="n">h</span> <span class="o">+</span> <span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">u</span><span class="p">)</span><span class="o">*</span><span class="n">g</span>
+</pre></div>
 
-<span class="k">class</span> <span class="nc">MyGRU</span><span class="p">(</span><span class="n">Module</span><span class="p">):</span>
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>In contrast to a LSTM cell, a GRU cell only has one hidden state (<code>h</code>) and two gates (<code>self.u_gate</code> and <code>self.r_gate</code>). As in the LSTM cell, the hidden state and the input at current time step would first be stacked together.</p>
+
+<pre><code>h_t = torch.stack([h, x], dim=1).view(-1, self.n_size)</code></pre>
+<p>This hidden state would be passed into two gates: update gate and reset gate.</p>
+
+<pre><code>u = torch.sigmoid(self.u_gate(h_t))
+r = torch.sigmoid(self.r_gate(h_t))</code></pre>
+<p>Next, we compute a new hidden state.</p>
+
+<pre><code>rh = h * r
+x_rh = torch.stack([x, rh], dim=1).view(-1, self.n_size)
+g = torch.tanh(self.g(x_rh))</code></pre>
+<p>The final output is a weighted average of the original hidden state and the new hidden state.</p>
+
+<pre><code>u * h + (1-u) * g</code></pre>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Let's apply this GRU cell to a RNN and train this RNN:</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">class</span> <span class="nc">MyGRU</span><span class="p">(</span><span class="n">Module</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vocab_sz</span><span class="p">,</span> <span class="n">n_hidden</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">i_h</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Embedding</span><span class="p">(</span><span class="n">vocab_sz</span><span class="p">,</span> <span class="n">n_hidden</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">rnn</span> <span class="o">=</span> <span class="n">GRUcell</span><span class="p">(</span><span class="n">n_hidden</span><span class="p">,</span> <span class="n">n_hidden</span><span class="p">)</span>
@@ -1966,9 +2036,37 @@ output = torch.sigmoid(self.outout_gate(h))</code></pre>
 <div class="cell border-box-sizing text_cell rendered">
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
+<p>Surprisingly, this GRU model gets 85% accuray which is much better than the LSTM one.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p></p>
+<div class="flash">
+    <svg class="octicon octicon-info" viewbox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M8 1.5a6.5 6.5 0 100 13 6.5 6.5 0 000-13zM0 8a8 8 0 1116 0A8 8 0 010 8zm6.5-.25A.75.75 0 017.25 7h1a.75.75 0 01.75.75v2.75h.25a.75.75 0 010 1.5h-2a.75.75 0 010-1.5h.25v-2h-.25a.75.75 0 01-.75-.75zM8 6a1 1 0 100-2 1 1 0 000 2z"></path></svg>
+    <strong>Note: </strong>LSTM and GRU makes it easier to retain long-term information by adjusting those gates.
+</div>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
 <h2 id="LSTM-+-Regularization-techniques">
 <a class="anchor" href="#LSTM-+-Regularization-techniques" aria-hidden="true"><span class="octicon octicon-link"></span></a>LSTM + Regularization techniques<a class="anchor-link" href="#LSTM-+-Regularization-techniques"> </a>
 </h2>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>To get a good performance, the last model I train uses Pytorch's <code>nn.LSTM</code> module and serveral regularization techniques.</p>
+
 </div>
 </div>
 </div>
@@ -2060,6 +2158,22 @@ output = torch.sigmoid(self.outout_gate(h))</code></pre>
 </div>
     
 
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>In this model, three regularization method are used:</p>
+<ul>
+<li>
+<strong>Dropout</strong>: randomly setting some weights of a unit to zero, implemented with <code>nn.Dropout</code>, the probability is set to 0.5.</li>
+<li>
+<strong>Activation Regularization (AR) and Temporal Activation Regularization (TAR)</strong>: Similar to weight decay, trying to make the activation (AR) and the difference between consecutive activations (TAR) as small as possible, implemented with the callback <code>RNNRegularizer</code>.</li>
+<li>
+<strong>Weight tying</strong>: setting the input embedding equal to the output embedding, <code>self.h_o.weight = self.i_h.weight</code> in the code.</li>
+</ul>
+
+</div>
+</div>
+</div>
     
     
 <div class="cell border-box-sizing code_cell rendered">
@@ -2146,6 +2260,14 @@ output = torch.sigmoid(self.outout_gate(h))</code></pre>
 </div>
     
 
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>This final model gets a great accuracy of 95.5%!</p>
+
+</div>
+</div>
+</div>
 <div class="cell border-box-sizing text_cell rendered">
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
