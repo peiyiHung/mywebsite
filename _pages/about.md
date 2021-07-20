@@ -10,6 +10,6 @@ I earned my bachelor's degree and my master's degree both in Economics from Nati
 
 I have never stop learning even after leaving school. I sharpen my data science skills by making practical projects. These skills include web scaping using Python, data wrangling and data visualization using Pandas, training machine learning models using Scikit-Learn and training deep learning using Pytorch. These projects include a variety of tasks such as regression on tabular data, image classification and text classification. All these projects can be found in the [**Projects** ](https://peiyihung.github.io/mywebsite/projects/) section. On the other hand, I believe explaining what you learn can enhance your learning, so I document what I've learned in the [**Learning**](https://peiyihung.github.io/mywebsite/learning/) section.
 
-
+If you want to contact me, you can do that by this email <p8526900@gmail.com>.
 
 
