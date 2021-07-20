@@ -176,7 +176,7 @@
   
       ,"page3": {
           "title": "Learning",
-          "content": "My Learning Notes . . What does each tag means? . [ML]: Machine Learning | [DL]: Deep Learning | [Prob]: Probability | . . Notes . [DL] Experiments with activation functions and weights initialization . Investigate the distributions of activations throught layers with different activation functions and weights initialization . Apr 2, 2021 . | [DL] Why do we need nonlinear activation functions in a neural network ? . Explaining why we need nonlinear activation fucntions and illutrating it with python code . Dec 16, 2020 . | [ML] What&#39;s the difference between a metric and a loss? . . Dec 6, 2020 . | [Prob] Inclusion-Exculsion . How to compute the probability of union of several events? . Nov 20, 2020 . | .",
+          "content": "My Learning Notes . . What does each tag mean? . [ML]: Machine Learning | [DL]: Deep Learning | [Prob]: Probability | . . Notes . [DL] Experiments with activation functions and weights initialization . Investigate the distributions of activations throught layers with different activation functions and weights initialization . Apr 2, 2021 . | [DL] Why do we need nonlinear activation functions in a neural network ? . Explaining why we need nonlinear activation fucntions and illutrating it with python code . Dec 16, 2020 . | [ML] What&#39;s the difference between a metric and a loss? . . Dec 6, 2020 . | [Prob] Inclusion-Exculsion . How to compute the probability of union of several events? . Nov 20, 2020 . | .",
           "url": "https://peiyihung.github.io/mywebsite/learning/",
           "relUrl": "/learning/",
           "date": ""
